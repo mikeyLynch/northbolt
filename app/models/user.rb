@@ -1,4 +1,5 @@
 class User < ApplicationRecord
+  devise :database_authenticatable, :recoverable, :rememberable, :trackable, :validatable
   belongs_to :business
 
   validates :email, presence: true, uniqueness: true
