@@ -1,5 +1,12 @@
 class ApplicationController < ActionController::Base
   allow_browser versions: :modern
+  layout :current_layout
+
+  private
+
+  def current_layout
+    devise_controller? ? "auth" : "application"
+  end
 
   private
 
