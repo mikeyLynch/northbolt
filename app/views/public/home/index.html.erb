@@ -1,2 +1,101 @@
-<p>Home</p>
-<%= link_to "Sign in", new_user_session_path %>
+<%- content_for :title, "LockMono — Smart locks for self storage" %>
+
+<!-- Nav -->
+<nav class="fixed top-0 inset-x-0 z-50 bg-white border-b border-gray-200">
+  <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+    <span class="text-lg font-bold tracking-tight text-gray-900">LockMono</span>
+    <%= link_to "Sign in", new_user_session_path, class: "bg-gray-900 text-white hover:bg-gray-700 px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors" %>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="pt-40 pb-24 px-6 max-w-3xl mx-auto text-center">
+  <h1 class="text-5xl font-extrabold tracking-tight text-gray-900 leading-tight">
+    Smart locks for self storage.<br>No wiring. No engineer.
+  </h1>
+  <p class="mt-6 text-xl text-gray-500 leading-relaxed">
+    A battery-powered, cellular lock that mounts on any storage unit door in 20 minutes.
+    Tenants receive access automatically. Access is revoked automatically.
+    You never touch anything.
+  </p>
+  <div class="mt-10 flex items-center justify-center gap-6">
+    <%= link_to "Sign in to your dashboard", new_user_session_path, class: "bg-gray-900 text-white hover:bg-gray-700 px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors" %>
+    <a href="#how-it-works" class="text-gray-700 hover:text-gray-900 text-sm font-semibold">How it works</a>
+  </div>
+</section>
+
+<!-- How it works -->
+<section id="how-it-works" class="py-20 bg-gray-50">
+  <div class="max-w-5xl mx-auto px-6">
+    <h2 class="text-3xl font-bold tracking-tight text-gray-900 text-center mb-14">How it works</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+      <div>
+        <p class="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3">01</p>
+        <h3 class="text-lg font-bold text-gray-900 mb-2">Order and fit it yourself</h3>
+        <p class="text-sm text-gray-500 leading-relaxed">The lock arrives in the post. Mount it with four screws in 20 minutes. No electrician, no controller box, no site infrastructure of any kind.</p>
+      </div>
+      <div>
+        <p class="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3">02</p>
+        <h3 class="text-lg font-bold text-gray-900 mb-2">Access issued automatically</h3>
+        <p class="text-sm text-gray-500 leading-relaxed">When a tenant is granted access, a 4-digit PIN is generated and sent to them by SMS and email. The lock receives it over cellular. No manual step required.</p>
+      </div>
+      <div>
+        <p class="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3">03</p>
+        <h3 class="text-lg font-bold text-gray-900 mb-2">Access revoked automatically</h3>
+        <p class="text-sm text-gray-500 leading-relaxed">When a lease ends or a payment fails, access is revoked. The PIN stops working. The operator never has to visit the site.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Features -->
+<section class="py-20">
+  <div class="max-w-5xl mx-auto px-6">
+    <h2 class="text-3xl font-bold tracking-tight text-gray-900 text-center mb-14">Built for independent operators</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="p-8 border border-gray-200 rounded-xl">
+        <h3 class="font-bold text-gray-900 mb-2">No site infrastructure</h3>
+        <p class="text-sm text-gray-500 leading-relaxed">Each lock contains its own cellular modem and SIM card. There is no hub, no mains wiring, and no dependency on site Wi-Fi.</p>
+      </div>
+      <div class="p-8 border border-gray-200 rounded-xl">
+        <h3 class="font-bold text-gray-900 mb-2">Works in poor signal</h3>
+        <p class="text-sm text-gray-500 leading-relaxed">PINs are validated on the lock itself. Access works even when there is no live network connection at the moment a tenant enters.</p>
+      </div>
+      <div class="p-8 border border-gray-200 rounded-xl">
+        <h3 class="font-bold text-gray-900 mb-2">Long battery life</h3>
+        <p class="text-sm text-gray-500 leading-relaxed">The locking mechanism draws power only during an access event. The dashboard gives you advance warning before a battery needs attention.</p>
+      </div>
+      <div class="p-8 border border-gray-200 rounded-xl">
+        <h3 class="font-bold text-gray-900 mb-2">Complete audit trail</h3>
+        <p class="text-sm text-gray-500 leading-relaxed">Every access attempt is logged with a timestamp. View the full history for any lock or location from the dashboard at any time.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Pricing -->
+<section class="py-20 bg-gray-50">
+  <div class="max-w-2xl mx-auto px-6 text-center">
+    <h2 class="text-3xl font-bold tracking-tight text-gray-900 mb-4">Simple pricing</h2>
+    <p class="text-gray-500 mb-14">One-time hardware cost. One flat monthly fee. No surprises.</p>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
+      <div class="bg-white border border-gray-200 rounded-xl p-8">
+        <p class="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-4">Hardware</p>
+        <p class="text-5xl font-extrabold text-gray-900 tracking-tight">£299</p>
+        <p class="text-sm text-gray-500 mt-2">per lock, one-time purchase</p>
+      </div>
+      <div class="bg-gray-900 rounded-xl p-8 text-white">
+        <p class="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-4">Subscription</p>
+        <p class="text-5xl font-extrabold tracking-tight">£4</p>
+        <p class="text-sm text-gray-400 mt-2">per lock, per month</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="py-10 border-t border-gray-100">
+  <div class="max-w-6xl mx-auto px-6 text-center text-sm text-gray-400">
+    &copy; <%= Time.current.year %> LockMono. All rights reserved.
+  </div>
+</footer>
