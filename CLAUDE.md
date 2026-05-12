@@ -1,5 +1,7 @@
 # CLAUDE.md
 
+The company and product is called Northbolt.
+
 Read this fully before writing any code. It explains what we're building and why. Implementation decisions are made collaboratively as we work — this file is the foundation, not a prescription.
 
 ---
