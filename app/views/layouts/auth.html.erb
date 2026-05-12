@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= content_for(:title) || "LockMono" %></title>
+    <title><%= content_for(:title) || "Northbolt" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
@@ -13,8 +13,8 @@
   </head>
   <body class="bg-gray-50 text-gray-900 antialiased min-h-screen flex flex-col items-center justify-center px-6">
     <div class="w-full max-w-sm">
-      <%= link_to public_root_path, class: "block text-center mb-10" do %>
-        <span class="text-xl font-bold tracking-tight text-gray-900">LockMono</span>
+      <%= link_to public_root_path, class: "flex justify-center mb-10 text-gray-900" do %>
+        <%= render "shared/logo" %>
       <% end %>
       <%= yield %>
     </div>

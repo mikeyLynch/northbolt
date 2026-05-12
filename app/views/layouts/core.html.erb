@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= content_for(:title) || "LockMono Dashboard" %></title>
+    <title><%= content_for(:title) || "Northbolt Dashboard" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
@@ -20,7 +20,7 @@
           <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
         </svg>
       </button>
-      <span class="text-base font-bold tracking-tight text-gray-900">LockMono</span>
+      <%= render "shared/logo", size: :sm, text_size: "text-base" %>
     </div>
 
     <!-- Backdrop -->
@@ -35,7 +35,7 @@
 
       <!-- Logo -->
       <div class="h-16 flex items-center px-6 border-b border-gray-200 shrink-0">
-        <span class="text-lg font-bold tracking-tight text-gray-900">LockMono</span>
+        <%= render "shared/logo" %>
       </div>
 
       <!-- Nav links -->
