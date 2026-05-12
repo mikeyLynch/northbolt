@@ -1,0 +1,9 @@
+<turbo-frame id="notifications_frame">
+  <div class="flex justify-end px-4 py-3 border-b border-gray-100">
+    <%= button_to "Mark all as read", core_notifications_read_all_path, method: :patch,
+          class: "text-xs text-gray-400 hover:text-gray-900 cursor-pointer" %>
+  </div>
+  <div id="notifications_list">
+    <%= render "core/notifications/list", notifications: @notifications %>
+  </div>
+</turbo-frame>

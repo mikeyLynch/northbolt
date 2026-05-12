@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_05_11_193545) do
+ActiveRecord::Schema[8.0].define(version: 2026_05_12_160508) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -40,6 +40,20 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_11_193545) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["location_id"], name: "index_locks_on_location_id"
+  end
+
+  create_table "notifications", force: :cascade do |t|
+    t.bigint "business_id", null: false
+    t.string "notifiable_type"
+    t.bigint "notifiable_id"
+    t.string "notification_type", null: false
+    t.string "title", null: false
+    t.text "body"
+    t.datetime "read_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_id"], name: "index_notifications_on_business_id"
+    t.index ["notifiable_type", "notifiable_id"], name: "index_notifications_on_notifiable"
   end
 
   create_table "solid_cache_entries", force: :cascade do |t|
@@ -197,6 +211,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_11_193545) do
 
   add_foreign_key "locations", "businesses"
   add_foreign_key "locks", "locations"
+  add_foreign_key "notifications", "businesses"
   add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_claimed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_failed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade

@@ -1,0 +1,26 @@
+<div id="notification_<%= notification.id %>" class="flex items-start gap-3 px-4 py-3 <%= notification.read? ? 'bg-white' : 'bg-gray-50' %>">
+  <div class="mt-0.5 shrink-0">
+    <% if !notification.read? %>
+      <span class="block w-2 h-2 rounded-full bg-gray-900 mt-1"></span>
+    <% else %>
+      <span class="block w-2 h-2"></span>
+    <% end %>
+  </div>
+
+  <div class="flex-1 min-w-0">
+    <% if notification.notifiable.present? %>
+      <a href="#" class="text-sm font-medium text-gray-900 hover:underline"><%= notification.title %></a>
+    <% else %>
+      <p class="text-sm font-medium text-gray-900"><%= notification.title %></p>
+    <% end %>
+    <% if notification.body.present? %>
+      <p class="text-xs text-gray-500 mt-0.5"><%= notification.body %></p>
+    <% end %>
+    <p class="text-xs text-gray-400 mt-1"><%= time_ago_in_words(notification.created_at) %> ago</p>
+  </div>
+
+  <% unless notification.read? %>
+    <%= button_to "Mark read", core_notification_read_path(notification), method: :patch,
+          class: "shrink-0 text-xs text-gray-400 hover:text-gray-900 cursor-pointer whitespace-nowrap" %>
+  <% end %>
+</div>
