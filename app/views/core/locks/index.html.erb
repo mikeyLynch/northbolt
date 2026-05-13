@@ -55,7 +55,7 @@
               <th class="px-4 py-3 text-left font-medium text-gray-500">Location</th>
             <% end %>
             <th class="px-4 py-3 text-left font-medium text-gray-500 hidden sm:table-cell">Device UUID</th>
-            <th class="px-4 py-3 text-left font-medium text-gray-500 hidden md:table-cell">Last seen</th>
+            <th class="px-4 py-3 text-left font-medium text-gray-500 hidden md:table-cell">Connection</th>
             <th class="px-4 py-3"></th>
           </tr>
         </thead>
@@ -67,11 +67,22 @@
                 <td class="px-4 py-3 text-gray-500"><%= lock.location.name %></td>
               <% end %>
               <td class="px-4 py-3 text-gray-400 font-mono text-xs hidden sm:table-cell"><%= lock.device_uuid %></td>
-              <td class="px-4 py-3 text-gray-400 hidden md:table-cell">
-                <% if lock.last_seen_at %>
-                  <%= time_ago_in_words(lock.last_seen_at) %> ago
+              <td class="px-4 py-3 hidden md:table-cell">
+                <% if lock.probably_online? %>
+                  <span class="flex items-center gap-1.5 text-xs text-green-600">
+                    <span class="w-2 h-2 rounded-full bg-green-500 shrink-0"></span>
+                    Online
+                  </span>
+                <% elsif lock.last_seen_at? %>
+                  <span class="flex items-center gap-1.5 text-xs text-red-500">
+                    <span class="w-2 h-2 rounded-full bg-red-400 shrink-0"></span>
+                    Not connecting
+                  </span>
                 <% else %>
-                  <span class="text-gray-300">Never</span>
+                  <span class="flex items-center gap-1.5 text-xs text-gray-400">
+                    <span class="w-2 h-2 rounded-full bg-gray-300 shrink-0"></span>
+                    Never seen
+                  </span>
                 <% end %>
               </td>
               <td class="px-4 py-3 text-right">
