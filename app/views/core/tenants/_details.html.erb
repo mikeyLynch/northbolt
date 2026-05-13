@@ -1,0 +1,18 @@
+<div class="bg-white border border-gray-200 rounded-xl divide-y divide-gray-100">
+  <div class="px-4 py-3 flex items-center justify-between">
+    <span class="text-sm text-gray-500">Full name</span>
+    <span class="text-sm font-medium text-gray-900"><%= @tenant.full_name %></span>
+  </div>
+  <div class="px-4 py-3 flex items-center justify-between">
+    <span class="text-sm text-gray-500">Email</span>
+    <span class="text-sm text-gray-900"><%= @tenant.email %></span>
+  </div>
+  <div class="px-4 py-3 flex items-center justify-between">
+    <span class="text-sm text-gray-500">Phone</span>
+    <span class="text-sm text-gray-900"><%= @tenant.phone %></span>
+  </div>
+  <div class="px-4 py-3 flex items-center justify-between">
+    <span class="text-sm text-gray-500">Added</span>
+    <span class="text-sm text-gray-900"><%= @tenant.created_at.strftime("%-d %B %Y") %></span>
+  </div>
+</div>

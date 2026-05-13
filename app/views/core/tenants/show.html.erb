@@ -1,0 +1,44 @@
+<% content_for :title, @tenant.full_name %>
+
+<div class="max-w-3xl mx-auto space-y-6">
+
+  <div class="flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <%= link_to core_tenants_path, class: "text-gray-400 hover:text-gray-900 transition-colors" do %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+        </svg>
+      <% end %>
+      <h1 class="text-lg font-semibold text-gray-900"><%= @tenant.full_name %></h1>
+    </div>
+    <%= link_to "Assign lock", new_core_tenant_access_grant_path(@tenant),
+          class: "px-3 py-2 text-sm font-medium bg-gray-900 text-white rounded-lg hover:bg-gray-700 transition-colors" %>
+  </div>
+
+  <% if flash[:granted_pin] %>
+    <div class="px-4 py-4 rounded-xl bg-green-50 border border-green-200 space-y-1">
+      <p class="text-sm font-semibold text-green-800">Access granted — PIN issued</p>
+      <p class="text-3xl font-mono font-bold tracking-widest text-green-900"><%= flash[:granted_pin] %></p>
+      <p class="text-xs text-green-700">This PIN has been sent to <%= @tenant.email %> and <%= @tenant.phone %>. It will not be shown again.</p>
+    </div>
+  <% end %>
+
+  <!-- Tabs -->
+  <div class="flex gap-1 border-b border-gray-200">
+    <%= link_to "Details", core_tenant_path(@tenant, tab: "details"),
+          class: "px-4 py-2 text-sm font-medium border-b-2 transition-colors #{@tab == 'details' ? 'border-gray-900 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-900'}",
+          data: { turbo_frame: "tenant_tab", turbo_action: "advance" } %>
+    <%= link_to "Access history", core_tenant_path(@tenant, tab: "history"),
+          class: "px-4 py-2 text-sm font-medium border-b-2 transition-colors #{@tab == 'history' ? 'border-gray-900 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-900'}",
+          data: { turbo_frame: "tenant_tab", turbo_action: "advance" } %>
+  </div>
+
+  <turbo-frame id="tenant_tab">
+    <% if @tab == "history" %>
+      <%= render "history" %>
+    <% else %>
+      <%= render "details" %>
+    <% end %>
+  </turbo-frame>
+
+</div>

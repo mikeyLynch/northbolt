@@ -1,0 +1,36 @@
+<div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
+  <% if @access_grants.any? %>
+    <table class="w-full text-sm">
+      <thead>
+        <tr class="border-b border-gray-100 bg-gray-50">
+          <th class="px-4 py-3 text-left font-medium text-gray-500">Unit</th>
+          <th class="px-4 py-3 text-left font-medium text-gray-500 hidden sm:table-cell">Location</th>
+          <th class="px-4 py-3 text-left font-medium text-gray-500">From</th>
+          <th class="px-4 py-3 text-left font-medium text-gray-500 hidden sm:table-cell">Until</th>
+          <th class="px-4 py-3 text-left font-medium text-gray-500">Status</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100">
+        <% @access_grants.each do |grant| %>
+          <tr class="hover:bg-gray-50 transition-colors">
+            <td class="px-4 py-3 font-medium text-gray-900">
+              <%= link_to grant.lock.unit_identifier, core_lock_path(grant.lock), class: "hover:underline" %>
+            </td>
+            <td class="px-4 py-3 text-gray-500 hidden sm:table-cell"><%= grant.lock.location.name %></td>
+            <td class="px-4 py-3 text-gray-500"><%= grant.starts_at.strftime("%-d %b %Y") %></td>
+            <td class="px-4 py-3 text-gray-500 hidden sm:table-cell"><%= grant.ends_at.strftime("%-d %b %Y") %></td>
+            <td class="px-4 py-3">
+              <% if grant.active? %>
+                <span class="text-xs font-medium text-green-600">Active</span>
+              <% else %>
+                <span class="text-xs text-gray-400">Revoked</span>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% else %>
+    <div class="px-4 py-12 text-center text-sm text-gray-400">No access history yet.</div>
+  <% end %>
+</div>

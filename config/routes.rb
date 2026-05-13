@@ -13,7 +13,12 @@ Rails.application.routes.draw do
     get  "notifications/unread_count", to: "notifications#unread_count", as: :notifications_unread_count
     patch "notifications/read_all", to: "notifications#read_all", as: :notifications_read_all
     patch "notifications/:id/read", to: "notifications#read",   as: :notification_read
-    resources :locks, only: [ :index, :show ]
+    resources :locks, only: [ :index, :show ] do
+      resources :access_grants, only: [ :new, :create ], module: :locks
+    end
+    resources :tenants, only: [ :index, :show ] do
+      resources :access_grants, only: [ :new, :create ], module: :tenants
+    end
   end
 
   namespace :api do

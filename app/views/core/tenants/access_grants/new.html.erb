@@ -1,0 +1,49 @@
+<% content_for :title, "Assign lock — #{@tenant.full_name}" %>
+
+<div class="max-w-lg mx-auto space-y-6">
+
+  <div class="flex items-center gap-3">
+    <%= link_to core_tenant_path(@tenant), class: "text-gray-400 hover:text-gray-900 transition-colors" do %>
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+      </svg>
+    <% end %>
+    <h1 class="text-lg font-semibold text-gray-900">Assign lock to <%= @tenant.full_name %></h1>
+  </div>
+
+  <% if flash[:alert] %>
+    <div class="px-4 py-3 rounded-lg bg-red-50 text-sm text-red-600"><%= flash[:alert] %></div>
+  <% end %>
+
+  <%= form_with url: core_tenant_access_grants_path(@tenant), method: :post do |f| %>
+    <div class="bg-white border border-gray-200 rounded-xl divide-y divide-gray-100">
+
+      <div class="px-4 py-4 space-y-1">
+        <%= f.label :lock_id, "Unit", class: "block text-sm font-medium text-gray-700" %>
+        <% if @available_locks.any? %>
+          <%= f.select :lock_id,
+                @available_locks.map { |l| ["#{l.unit_identifier} — #{l.location.name}", l.id] },
+                { prompt: "Select a unit…" },
+                class: "w-full py-2 px-3 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-gray-900" %>
+        <% else %>
+          <p class="text-sm text-gray-400">No available locks. All locks at this business currently have active tenants.</p>
+        <% end %>
+      </div>
+
+      <div class="px-4 py-4 space-y-1">
+        <%= f.label :ends_at, "Access until", class: "block text-sm font-medium text-gray-700" %>
+        <%= f.date_field :ends_at,
+              min: Date.tomorrow,
+              value: 1.month.from_now.to_date,
+              class: "w-full py-2 px-3 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-gray-900" %>
+      </div>
+
+      <div class="px-4 py-4 flex justify-end">
+        <%= f.submit "Grant access", class: "px-4 py-2 text-sm font-medium bg-gray-900 text-white rounded-lg hover:bg-gray-700 transition-colors cursor-pointer",
+              disabled: @available_locks.empty? %>
+      </div>
+
+    </div>
+  <% end %>
+
+</div>

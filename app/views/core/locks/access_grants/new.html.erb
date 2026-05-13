@@ -1,0 +1,90 @@
+<% content_for :title, "Assign tenant — Unit #{@lock.unit_identifier}" %>
+
+<div class="max-w-lg mx-auto space-y-6">
+
+  <div class="flex items-center gap-3">
+    <%= link_to core_lock_path(@lock), class: "text-gray-400 hover:text-gray-900 transition-colors" do %>
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+      </svg>
+    <% end %>
+    <h1 class="text-lg font-semibold text-gray-900">Assign tenant to unit <%= @lock.unit_identifier %></h1>
+  </div>
+
+  <% if flash[:alert] %>
+    <div class="px-4 py-3 rounded-lg bg-red-50 text-sm text-red-600"><%= flash[:alert] %></div>
+  <% end %>
+
+  <%= form_with url: core_lock_access_grants_path(@lock), method: :post,
+        data: { controller: "tenant-select" } do |f| %>
+
+    <div class="bg-white border border-gray-200 rounded-xl divide-y divide-gray-100">
+
+      <!-- Tenant mode toggle -->
+      <div class="px-4 py-4 space-y-3">
+        <p class="text-sm font-medium text-gray-700">Tenant</p>
+        <div class="flex gap-2">
+          <button type="button" data-action="tenant-select#showExisting"
+                  class="px-3 py-1.5 text-sm rounded-lg border border-gray-200 font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+            Find existing
+          </button>
+          <button type="button" data-action="tenant-select#showNew"
+                  class="px-3 py-1.5 text-sm rounded-lg border border-gray-200 font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+            Add new
+          </button>
+        </div>
+
+        <%= f.hidden_field :tenant_mode, value: "existing", data: { "tenant-select-target" => "modeInput" } %>
+
+        <!-- Existing tenant -->
+        <div data-tenant-select-target="existingFields">
+          <% if @tenants.any? %>
+            <%= f.select :tenant_id,
+                  @tenants.map { |t| ["#{t.full_name} — #{t.email}", t.id] },
+                  { prompt: "Select a tenant…" },
+                  class: "w-full py-2 px-3 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-gray-900" %>
+          <% else %>
+            <p class="text-sm text-gray-400">No tenants in the system yet. Use "Add new" to create one.</p>
+          <% end %>
+        </div>
+
+        <!-- New tenant -->
+        <div data-tenant-select-target="newFields" class="hidden space-y-3">
+          <div class="grid grid-cols-2 gap-3">
+            <div class="space-y-1">
+              <%= f.label :first_name, "First name", class: "block text-xs font-medium text-gray-600" %>
+              <%= f.text_field :first_name, class: "w-full py-2 px-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900" %>
+            </div>
+            <div class="space-y-1">
+              <%= f.label :last_name, "Last name", class: "block text-xs font-medium text-gray-600" %>
+              <%= f.text_field :last_name, class: "w-full py-2 px-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900" %>
+            </div>
+          </div>
+          <div class="space-y-1">
+            <%= f.label :email, "Email", class: "block text-xs font-medium text-gray-600" %>
+            <%= f.email_field :email, class: "w-full py-2 px-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900" %>
+          </div>
+          <div class="space-y-1">
+            <%= f.label :phone, "Phone", class: "block text-xs font-medium text-gray-600" %>
+            <%= f.telephone_field :phone, class: "w-full py-2 px-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900" %>
+          </div>
+        </div>
+      </div>
+
+      <!-- Access until -->
+      <div class="px-4 py-4 space-y-1">
+        <%= f.label :ends_at, "Access until", class: "block text-sm font-medium text-gray-700" %>
+        <%= f.date_field :ends_at,
+              min: Date.tomorrow,
+              value: 1.month.from_now.to_date,
+              class: "w-full py-2 px-3 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-gray-900" %>
+      </div>
+
+      <div class="px-4 py-4 flex justify-end">
+        <%= f.submit "Grant access", class: "px-4 py-2 text-sm font-medium bg-gray-900 text-white rounded-lg hover:bg-gray-700 transition-colors cursor-pointer" %>
+      </div>
+
+    </div>
+  <% end %>
+
+</div>

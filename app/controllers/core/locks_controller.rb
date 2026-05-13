@@ -16,9 +16,9 @@ class Core::LocksController < Core::BaseController
     @sort = params[:sort].presence_in(%w[unit_asc unit_desc last_accessed_asc last_accessed_desc]) || "unit_asc"
 
     locks = case @sort
-            when "unit_desc"                            then locks.order(Arel.sql("length(unit_identifier) DESC, unit_identifier DESC"))
+            when "unit_desc"                               then locks.order(Arel.sql("length(unit_identifier) DESC, unit_identifier DESC"))
             when "last_accessed_asc", "last_accessed_desc" then locks.order(Arel.sql("length(unit_identifier), unit_identifier"))
-            else                                             locks.order(Arel.sql("length(unit_identifier), unit_identifier"))
+            else                                                locks.order(Arel.sql("length(unit_identifier), unit_identifier"))
             end
 
     @locks = locks.page(params[:page]).per(25)
@@ -26,6 +26,7 @@ class Core::LocksController < Core::BaseController
   end
 
   def show
-    @lock = current_user.business.locks.find(params[:id])
+    @lock = current_user.business.locks.includes(:location, :current_tenant).find(params[:id])
+    @access_grants = @lock.access_grants.includes(:tenant).order(created_at: :desc)
   end
 end
