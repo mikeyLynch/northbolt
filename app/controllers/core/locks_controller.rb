@@ -13,7 +13,15 @@ class Core::LocksController < Core::BaseController
       locks = locks.where("LOWER(unit_identifier) LIKE :q", q: query)
     end
 
-    @locks = locks.order(Arel.sql("length(unit_identifier), unit_identifier")).page(params[:page]).per(25)
+    @sort = params[:sort].presence_in(%w[unit_asc unit_desc last_accessed_asc last_accessed_desc]) || "unit_asc"
+
+    locks = case @sort
+            when "unit_desc"                            then locks.order(Arel.sql("length(unit_identifier) DESC, unit_identifier DESC"))
+            when "last_accessed_asc", "last_accessed_desc" then locks.order(Arel.sql("length(unit_identifier), unit_identifier"))
+            else                                             locks.order(Arel.sql("length(unit_identifier), unit_identifier"))
+            end
+
+    @locks = locks.page(params[:page]).per(25)
     @q = params[:q]
   end
 

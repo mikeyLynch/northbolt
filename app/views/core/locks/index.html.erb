@@ -6,27 +6,39 @@
     <h1 class="text-lg font-semibold text-gray-900">Locks</h1>
   </div>
 
-  <!-- Search -->
+  <!-- Search + Sort -->
   <%= form_with url: core_locks_path, method: :get do |f| %>
     <%= f.hidden_field :location_id, value: @location&.id %>
-    <div class="relative">
-      <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 0 5 11a6 6 0 0 0 12 0z" />
-      </svg>
-      <%= f.text_field :q, value: @q,
-            placeholder: "Search by unit number…",
-            class: "w-full pl-10 pr-4 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent",
-            autocomplete: "off" %>
+    <div class="flex gap-2">
+      <div class="relative flex-1">
+        <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 0 5 11a6 6 0 0 0 12 0z" />
+        </svg>
+        <%= f.text_field :q, value: @q,
+              placeholder: "Search by unit number…",
+              class: "w-full pl-10 pr-4 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent",
+              autocomplete: "off" %>
+      </div>
+      <%= f.select :sort,
+            [
+              ["Unit number (A–Z)",         "unit_asc"],
+              ["Unit number (Z–A)",         "unit_desc"],
+              ["Last accessed (newest)",    "last_accessed_desc"],
+              ["Last accessed (oldest)",    "last_accessed_asc"]
+            ],
+            { selected: @sort },
+            class: "py-2 px-3 text-sm border border-gray-200 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-900 cursor-pointer",
+            onchange: "this.form.requestSubmit()" %>
     </div>
   <% end %>
 
   <% if @locations.many? %>
     <!-- Location filter -->
     <div class="flex gap-1 flex-wrap">
-      <%= link_to "All", core_locks_path(q: @q),
+      <%= link_to "All", core_locks_path(q: @q, sort: @sort),
             class: "px-3 py-1.5 rounded-lg text-sm font-medium transition-colors #{@location.nil? ? 'bg-gray-900 text-white' : 'text-gray-500 hover:bg-gray-100'}" %>
       <% @locations.each do |location| %>
-        <%= link_to location.name, core_locks_path(q: @q, location_id: location.id),
+        <%= link_to location.name, core_locks_path(q: @q, sort: @sort, location_id: location.id),
               class: "px-3 py-1.5 rounded-lg text-sm font-medium transition-colors #{@location == location ? 'bg-gray-900 text-white' : 'text-gray-500 hover:bg-gray-100'}" %>
       <% end %>
     </div>
@@ -75,11 +87,11 @@
           <span><%= @locks.offset_value + 1 %>–<%= [@locks.offset_value + @locks.limit_value, @locks.total_count].min %> of <%= @locks.total_count %></span>
           <div class="flex gap-1">
             <% unless @locks.first_page? %>
-              <%= link_to "← Previous", core_locks_path(page: @locks.prev_page, q: @q, location_id: @location&.id),
+              <%= link_to "← Previous", core_locks_path(page: @locks.prev_page, q: @q, sort: @sort, location_id: @location&.id),
                     class: "px-3 py-1 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors" %>
             <% end %>
             <% unless @locks.last_page? %>
-              <%= link_to "Next →", core_locks_path(page: @locks.next_page, q: @q, location_id: @location&.id),
+              <%= link_to "Next →", core_locks_path(page: @locks.next_page, q: @q, sort: @sort, location_id: @location&.id),
                     class: "px-3 py-1 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors" %>
             <% end %>
           </div>
