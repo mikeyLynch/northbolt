@@ -41,14 +41,7 @@ RSpec.describe "Core::Locks", type: :request do
         end
       end
 
-      context "with a search query matching device UUID" do
-        it "returns the matching lock" do
-          get core_locks_path, params: { q: lock.device_uuid }
-          expect(response.body).to include(core_lock_path(lock))
-        end
-      end
-
-      context "with a search query that matches nothing" do
+context "with a search query that matches nothing" do
         it "shows the empty state" do
           get core_locks_path, params: { q: "zzznomatch" }
           expect(response.body).to include("No locks found matching")

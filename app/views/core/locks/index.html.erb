@@ -7,15 +7,28 @@
   </div>
 
   <!-- Search -->
-  <%= form_with url: core_locks_path, method: :get, data: { turbo_frame: "_top" } do |f| %>
+  <%= form_with url: core_locks_path, method: :get do |f| %>
+    <%= f.hidden_field :location_id, value: @location&.id %>
     <div class="relative">
       <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
         <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 0 5 11a6 6 0 0 0 12 0z" />
       </svg>
       <%= f.text_field :q, value: @q,
-            placeholder: "Search by unit number or device UUID…",
+            placeholder: "Search by unit number…",
             class: "w-full pl-10 pr-4 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent",
             autocomplete: "off" %>
+    </div>
+  <% end %>
+
+  <% if @locations.many? %>
+    <!-- Location filter -->
+    <div class="flex gap-1 flex-wrap">
+      <%= link_to "All", core_locks_path(q: @q),
+            class: "px-3 py-1.5 rounded-lg text-sm font-medium transition-colors #{@location.nil? ? 'bg-gray-900 text-white' : 'text-gray-500 hover:bg-gray-100'}" %>
+      <% @locations.each do |location| %>
+        <%= link_to location.name, core_locks_path(q: @q, location_id: location.id),
+              class: "px-3 py-1.5 rounded-lg text-sm font-medium transition-colors #{@location == location ? 'bg-gray-900 text-white' : 'text-gray-500 hover:bg-gray-100'}" %>
+      <% end %>
     </div>
   <% end %>
 
@@ -26,7 +39,9 @@
         <thead>
           <tr class="border-b border-gray-100 bg-gray-50">
             <th class="px-4 py-3 text-left font-medium text-gray-500">Unit</th>
-            <th class="px-4 py-3 text-left font-medium text-gray-500">Location</th>
+            <% if @locations.many? %>
+              <th class="px-4 py-3 text-left font-medium text-gray-500">Location</th>
+            <% end %>
             <th class="px-4 py-3 text-left font-medium text-gray-500 hidden sm:table-cell">Device UUID</th>
             <th class="px-4 py-3 text-left font-medium text-gray-500 hidden md:table-cell">Last seen</th>
             <th class="px-4 py-3"></th>
@@ -36,7 +51,9 @@
           <% @locks.each do |lock| %>
             <tr class="hover:bg-gray-50 transition-colors">
               <td class="px-4 py-3 font-medium text-gray-900"><%= lock.unit_identifier %></td>
-              <td class="px-4 py-3 text-gray-500"><%= lock.location.name %></td>
+              <% if @locations.many? %>
+                <td class="px-4 py-3 text-gray-500"><%= lock.location.name %></td>
+              <% end %>
               <td class="px-4 py-3 text-gray-400 font-mono text-xs hidden sm:table-cell"><%= lock.device_uuid %></td>
               <td class="px-4 py-3 text-gray-400 hidden md:table-cell">
                 <% if lock.last_seen_at %>
@@ -58,11 +75,11 @@
           <span><%= @locks.offset_value + 1 %>–<%= [@locks.offset_value + @locks.limit_value, @locks.total_count].min %> of <%= @locks.total_count %></span>
           <div class="flex gap-1">
             <% unless @locks.first_page? %>
-              <%= link_to "← Previous", core_locks_path(page: @locks.prev_page, q: @q),
+              <%= link_to "← Previous", core_locks_path(page: @locks.prev_page, q: @q, location_id: @location&.id),
                     class: "px-3 py-1 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors" %>
             <% end %>
             <% unless @locks.last_page? %>
-              <%= link_to "Next →", core_locks_path(page: @locks.next_page, q: @q),
+              <%= link_to "Next →", core_locks_path(page: @locks.next_page, q: @q, location_id: @location&.id),
                     class: "px-3 py-1 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors" %>
             <% end %>
           </div>
@@ -72,7 +89,9 @@
     <% else %>
       <div class="px-4 py-12 text-center text-sm text-gray-400">
         <% if @q.present? %>
-          No locks found matching "<%= @q %>"
+          No locks found matching "<%= @q %>"<%= " in #{@location.name}" if @location %>
+        <% elsif @location %>
+          No locks at <%= @location.name %>.
         <% else %>
           No locks yet.
         <% end %>
