@@ -9,6 +9,12 @@ RSpec.describe Lock, type: :model do
     it { is_expected.to validate_presence_of(:unit_identifier) }
   end
 
+  describe "#bolt_position" do
+    it "returns :unknown" do
+      expect(build(:lock).bolt_position).to eq(:unknown)
+    end
+  end
+
   describe "#probably_online?" do
     it "returns true when last_seen_at is within 10 minutes" do
       lock = build(:lock, last_seen_at: 5.minutes.ago)
