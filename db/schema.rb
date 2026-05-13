@@ -10,9 +10,23 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_05_12_164853) do
+ActiveRecord::Schema[8.0].define(version: 2026_05_13_154339) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "access_grants", force: :cascade do |t|
+    t.bigint "lock_id", null: false
+    t.bigint "tenant_id", null: false
+    t.string "pin_digest", null: false
+    t.datetime "starts_at", null: false
+    t.datetime "ends_at", null: false
+    t.datetime "revoked_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["lock_id", "revoked_at"], name: "index_access_grants_on_lock_id_and_revoked_at"
+    t.index ["lock_id"], name: "index_access_grants_on_lock_id"
+    t.index ["tenant_id"], name: "index_access_grants_on_tenant_id"
+  end
 
   create_table "businesses", force: :cascade do |t|
     t.string "name", null: false
@@ -190,6 +204,18 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_12_164853) do
     t.index ["key"], name: "index_solid_queue_semaphores_on_key", unique: true
   end
 
+  create_table "tenants", force: :cascade do |t|
+    t.bigint "business_id", null: false
+    t.string "first_name", null: false
+    t.string "last_name", null: false
+    t.string "email", null: false
+    t.string "phone", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_id", "email"], name: "index_tenants_on_business_id_and_email", unique: true
+    t.index ["business_id"], name: "index_tenants_on_business_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.bigint "business_id", null: false
     t.string "email", null: false
@@ -211,6 +237,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_12_164853) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "access_grants", "locks"
+  add_foreign_key "access_grants", "tenants"
   add_foreign_key "locations", "businesses"
   add_foreign_key "locks", "locations"
   add_foreign_key "notifications", "businesses"
@@ -220,5 +248,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_12_164853) do
   add_foreign_key "solid_queue_ready_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_recurring_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_scheduled_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
+  add_foreign_key "tenants", "businesses"
   add_foreign_key "users", "businesses"
 end

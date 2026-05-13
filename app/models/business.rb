@@ -1,6 +1,7 @@
 class Business < ApplicationRecord
   has_many :locations, dependent: :destroy
   has_many :locks, through: :locations
+  has_many :tenants, dependent: :destroy
   has_many :users, dependent: :destroy
   has_many :notifications, dependent: :destroy
 
