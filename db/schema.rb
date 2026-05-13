@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_05_12_160508) do
+ActiveRecord::Schema[8.0].define(version: 2026_05_12_164853) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -35,10 +35,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_12_160508) do
 
   create_table "locks", force: :cascade do |t|
     t.bigint "location_id", null: false
-    t.string "name", null: false
+    t.string "unit_identifier", null: false
     t.datetime "last_seen_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "device_uuid", null: false
+    t.index ["device_uuid"], name: "index_locks_on_device_uuid", unique: true
     t.index ["location_id"], name: "index_locks_on_location_id"
   end
 

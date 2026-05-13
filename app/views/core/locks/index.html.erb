@@ -1,0 +1,83 @@
+<% content_for :title, "Locks" %>
+
+<div class="max-w-5xl mx-auto space-y-6">
+
+  <div class="flex items-center justify-between">
+    <h1 class="text-lg font-semibold text-gray-900">Locks</h1>
+  </div>
+
+  <!-- Search -->
+  <%= form_with url: core_locks_path, method: :get, data: { turbo_frame: "_top" } do |f| %>
+    <div class="relative">
+      <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 0 5 11a6 6 0 0 0 12 0z" />
+      </svg>
+      <%= f.text_field :q, value: @q,
+            placeholder: "Search by unit number or device UUID…",
+            class: "w-full pl-10 pr-4 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent",
+            autocomplete: "off" %>
+    </div>
+  <% end %>
+
+  <!-- Table -->
+  <div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
+    <% if @locks.any? %>
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="border-b border-gray-100 bg-gray-50">
+            <th class="px-4 py-3 text-left font-medium text-gray-500">Unit</th>
+            <th class="px-4 py-3 text-left font-medium text-gray-500">Location</th>
+            <th class="px-4 py-3 text-left font-medium text-gray-500 hidden sm:table-cell">Device UUID</th>
+            <th class="px-4 py-3 text-left font-medium text-gray-500 hidden md:table-cell">Last seen</th>
+            <th class="px-4 py-3"></th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          <% @locks.each do |lock| %>
+            <tr class="hover:bg-gray-50 transition-colors">
+              <td class="px-4 py-3 font-medium text-gray-900"><%= lock.unit_identifier %></td>
+              <td class="px-4 py-3 text-gray-500"><%= lock.location.name %></td>
+              <td class="px-4 py-3 text-gray-400 font-mono text-xs hidden sm:table-cell"><%= lock.device_uuid %></td>
+              <td class="px-4 py-3 text-gray-400 hidden md:table-cell">
+                <% if lock.last_seen_at %>
+                  <%= time_ago_in_words(lock.last_seen_at) %> ago
+                <% else %>
+                  <span class="text-gray-300">Never</span>
+                <% end %>
+              </td>
+              <td class="px-4 py-3 text-right">
+                <%= link_to "View", core_lock_path(lock), class: "text-xs font-medium text-gray-500 hover:text-gray-900" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+
+      <% if @locks.total_pages > 1 %>
+        <div class="px-4 py-3 border-t border-gray-100 flex items-center justify-between text-sm text-gray-500">
+          <span><%= @locks.offset_value + 1 %>–<%= [@locks.offset_value + @locks.limit_value, @locks.total_count].min %> of <%= @locks.total_count %></span>
+          <div class="flex gap-1">
+            <% unless @locks.first_page? %>
+              <%= link_to "← Previous", core_locks_path(page: @locks.prev_page, q: @q),
+                    class: "px-3 py-1 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors" %>
+            <% end %>
+            <% unless @locks.last_page? %>
+              <%= link_to "Next →", core_locks_path(page: @locks.next_page, q: @q),
+                    class: "px-3 py-1 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors" %>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+
+    <% else %>
+      <div class="px-4 py-12 text-center text-sm text-gray-400">
+        <% if @q.present? %>
+          No locks found matching "<%= @q %>"
+        <% else %>
+          No locks yet.
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+
+</div>

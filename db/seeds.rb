@@ -10,8 +10,10 @@ locations.each do |attrs|
     l.assign_attributes(attrs)
   end
 
-  5.times do |i|
-    location.locks.find_or_create_by!(name: "Unit #{i + 1}")
+  100.times do |i|
+    location.locks.find_or_create_by!(unit_identifier: (i + 1).to_s) do |l|
+      l.device_uuid = SecureRandom.uuid
+    end
   end
 end
 

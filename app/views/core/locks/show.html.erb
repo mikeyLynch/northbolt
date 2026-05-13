@@ -1,0 +1,43 @@
+<% content_for :title, "Lock #{@lock.unit_identifier}" %>
+
+<div class="max-w-2xl mx-auto space-y-6">
+
+  <div class="flex items-center gap-3">
+    <%= link_to core_locks_path, class: "text-gray-400 hover:text-gray-900 transition-colors" do %>
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+      </svg>
+    <% end %>
+    <h1 class="text-lg font-semibold text-gray-900">Unit <%= @lock.unit_identifier %></h1>
+  </div>
+
+  <div class="bg-white border border-gray-200 rounded-xl divide-y divide-gray-100">
+    <div class="px-4 py-3 flex items-center justify-between">
+      <span class="text-sm text-gray-500">Device UUID</span>
+      <span class="text-sm font-mono text-gray-900"><%= @lock.device_uuid %></span>
+    </div>
+    <div class="px-4 py-3 flex items-center justify-between">
+      <span class="text-sm text-gray-500">Unit identifier</span>
+      <span class="text-sm font-medium text-gray-900"><%= @lock.unit_identifier %></span>
+    </div>
+    <div class="px-4 py-3 flex items-center justify-between">
+      <span class="text-sm text-gray-500">Location</span>
+      <span class="text-sm text-gray-900"><%= @lock.location.name %></span>
+    </div>
+    <div class="px-4 py-3 flex items-center justify-between">
+      <span class="text-sm text-gray-500">Last seen</span>
+      <span class="text-sm text-gray-900">
+        <% if @lock.last_seen_at %>
+          <%= time_ago_in_words(@lock.last_seen_at) %> ago
+        <% else %>
+          <span class="text-gray-400">Never</span>
+        <% end %>
+      </span>
+    </div>
+    <div class="px-4 py-3 flex items-center justify-between">
+      <span class="text-sm text-gray-500">Added</span>
+      <span class="text-sm text-gray-900"><%= @lock.created_at.strftime("%-d %B %Y") %></span>
+    </div>
+  </div>
+
+</div>
