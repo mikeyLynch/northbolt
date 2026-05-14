@@ -33,11 +33,18 @@
           <% @active_grants.each do |grant| %>
             <tr class="hover:bg-gray-50 transition-colors">
               <td class="px-4 py-3 font-medium text-gray-900">
-                <%= link_to "Unit #{grant.lock.unit_identifier}", core_lock_path(grant.lock), class: "hover:underline" %>
+                <%= link_to "Unit #{grant.lock.unit_identifier}", core_lock_path(grant.lock), class: "hover:underline", data: { turbo_frame: "_top" } %>
               </td>
               <td class="px-4 py-3 text-gray-500 hidden sm:table-cell"><%= grant.lock.location.name %></td>
               <td class="px-4 py-3 text-gray-500 text-right">
-                Until <%= grant.ends_at.strftime("%-d %b %Y") %>
+                <%= grant.starts_at.strftime("%-d %b %Y") %> — <%= grant.ends_at.strftime("%-d %b %Y") %>
+              </td>
+              <td class="px-4 py-3 text-right">
+                <% if grant.starts_at > Time.current %>
+                  <span class="text-xs font-medium text-amber-600">Upcoming</span>
+                <% else %>
+                  <span class="text-xs font-medium text-green-600">Active</span>
+                <% end %>
               </td>
             </tr>
           <% end %>
