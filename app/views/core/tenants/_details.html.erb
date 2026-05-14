@@ -2,6 +2,10 @@
 
   <div class="bg-white border border-gray-200 rounded-xl divide-y divide-gray-100">
     <div class="px-4 py-3 flex items-center justify-between">
+      <span class="text-sm font-medium text-gray-900">Details</span>
+      <%= link_to "Edit", edit_core_tenant_path(@tenant), class: "text-xs font-medium text-gray-400 hover:text-gray-900 transition-colors", data: { turbo_frame: "_top" } %>
+    </div>
+    <div class="px-4 py-3 flex items-center justify-between">
       <span class="text-sm text-gray-500">Full name</span>
       <span class="text-sm font-medium text-gray-900"><%= @tenant.full_name %></span>
     </div>

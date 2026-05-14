@@ -12,11 +12,8 @@
       <h1 class="text-lg font-semibold text-gray-900"><%= @tenant.full_name %></h1>
     </div>
     <div class="flex gap-2">
-      <%= link_to "Edit", edit_core_tenant_path(@tenant),
-            class: "px-3 py-2 text-sm font-medium border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors" %>
-      <%= button_to "Delete", core_tenant_path(@tenant), method: :delete,
-            class: "px-3 py-2 text-sm font-medium text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition-colors",
-            form: { data: { turbo_confirm: "Delete #{@tenant.full_name}? This cannot be undone." } } %>
+      <%= link_to "Assign locks", new_core_tenant_lock_assignments_path(@tenant),
+            class: "px-3 py-2 text-sm font-medium bg-gray-900 text-white rounded-lg hover:bg-gray-700 transition-colors" %>
     </div>
   </div>
 

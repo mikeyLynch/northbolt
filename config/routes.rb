@@ -1,7 +1,7 @@
 Rails.application.routes.draw do
   get "up" => "rails/health#show", as: :rails_health_check
 
-  devise_for :users, path: "", path_names: { sign_in: "sign_in", sign_out: "sign_out", password: "password" }, skip: [:registrations]
+  devise_for :users, path: "", path_names: { sign_in: "sign_in", sign_out: "sign_out", password: "password" }, skip: [ :registrations ]
 
   namespace :public, path: "" do
     root "home#index"
@@ -17,7 +17,8 @@ Rails.application.routes.draw do
       resources :access_grants, only: [ :new, :create ], module: :locks
     end
     resources :tenants, only: %i[ index show new create edit update destroy ] do
-      resources :access_grants, only: [ :new, :create ], module: :tenants
+      resource  :lock_assignments, only: %i[ new create ], module: :tenants
+      resources :access_grants,    only: %i[ new create ], module: :tenants
     end
   end
 
