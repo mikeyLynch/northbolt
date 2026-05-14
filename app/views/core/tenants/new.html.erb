@@ -11,7 +11,15 @@
     <h1 class="text-lg font-semibold text-gray-900">Add tenant</h1>
   </div>
 
-  <%= form_with model: [:core, @tenant], class: "space-y-6" do |f| %>
+  <%= form_with model: [:core, @tenant],
+        class: "space-y-6",
+        data: {
+          controller: "lock-picker",
+          lock_picker_locks_value: @available_locks.map { |l| { id: l.id, unit_identifier: l.unit_identifier, location_name: l.location.name } }.to_json,
+          action: "submit->lock-picker#interceptSubmit"
+        } do |f| %>
+
+    <input type="hidden" name="pin_mode" value="individual" data-lock-picker-target="pinModeInput">
 
     <% if @tenant.errors.any? %>
       <div class="px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-sm text-red-700 space-y-1">
@@ -52,9 +60,7 @@
     </div>
 
     <!-- Lock assignment -->
-    <div class="bg-white border border-gray-200 rounded-xl overflow-hidden"
-         data-controller="lock-picker"
-         data-lock-picker-locks-value="<%= @available_locks.map { |l| { id: l.id, unit_identifier: l.unit_identifier, location_name: l.location.name } }.to_json %>">
+    <div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
 
       <div class="px-4 py-3 flex items-center justify-between">
         <h2 class="text-sm font-medium text-gray-900">Assign locks <span class="text-gray-400 font-normal">(optional)</span></h2>
@@ -116,6 +122,33 @@
     <div class="flex gap-2 justify-end">
       <%= link_to "Cancel", core_tenants_path, class: "px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors" %>
       <%= f.submit "Add tenant", class: "px-4 py-2 text-sm font-medium bg-gray-900 text-white rounded-lg hover:bg-gray-700 transition-colors cursor-pointer" %>
+    </div>
+
+    <!-- PIN mode modal -->
+    <div data-lock-picker-target="modal"
+         class="hidden fixed inset-0 z-50 bg-gray-900/50">
+      <div class="flex items-center justify-center h-full px-4">
+      <div class="bg-white rounded-xl shadow-xl p-6 max-w-sm w-full space-y-4">
+        <div class="space-y-1">
+          <h3 class="text-sm font-semibold text-gray-900">PIN assignment</h3>
+          <p class="text-sm text-gray-500">Issue one PIN that works across all assigned locks, or a separate PIN for each?</p>
+        </div>
+        <div class="flex flex-col gap-2">
+          <button type="button"
+                  data-action="lock-picker#choosePinMode"
+                  data-mode="shared"
+                  class="w-full px-4 py-2.5 text-sm font-medium bg-gray-900 text-white rounded-lg hover:bg-gray-700 transition-colors">
+            One PIN for all locks
+          </button>
+          <button type="button"
+                  data-action="lock-picker#choosePinMode"
+                  data-mode="individual"
+                  class="w-full px-4 py-2.5 text-sm font-medium border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+            Individual PIN per lock
+          </button>
+        </div>
+      </div>
+      </div>
     </div>
 
   <% end %>

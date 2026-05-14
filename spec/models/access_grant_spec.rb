@@ -64,6 +64,15 @@ RSpec.describe AccessGrant, type: :model do
 
       expect(grant.pin_digest).not_to eq(pin)
     end
+
+    it "uses the supplied pin when one is provided" do
+      lock   = create(:lock)
+      tenant = create(:tenant)
+      grant, pin = AccessGrant.issue!(lock: lock, tenant: tenant, ends_at: 1.month.from_now, pin: "1234")
+
+      expect(pin).to eq("1234")
+      expect(BCrypt::Password.new(grant.pin_digest)).to eq("1234")
+    end
   end
 
   describe "#active? / #revoked?" do

@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["rows", "template"]
+  static targets = ["rows", "template", "modal", "pinModeInput"]
   static values  = { locks: Array }
 
   addRow() {
@@ -60,6 +60,25 @@ export default class extends Controller {
     dropdown.classList.add("hidden")
   }
 
+  interceptSubmit(event) {
+    if (this._pinModeChosen) return
+
+    const selectedCount = [...this.element.querySelectorAll("[data-lock-id-input]")]
+      .filter(input => input.value !== "").length
+
+    if (selectedCount > 1) {
+      event.preventDefault()
+      this.modalTarget.classList.remove("hidden")
+    }
+  }
+
+  choosePinMode(event) {
+    this.pinModeInputTarget.value = event.currentTarget.dataset.mode
+    this.modalTarget.classList.add("hidden")
+    this._pinModeChosen = true
+    this.element.requestSubmit()
+  }
+
   closeDropdowns(event) {
     if (!this.element.contains(event.target)) {
       this.element.querySelectorAll("[data-lock-dropdown]").forEach(d => d.classList.add("hidden"))
@@ -67,7 +86,8 @@ export default class extends Controller {
   }
 
   connect() {
-    this._outsideClick = this.closeDropdowns.bind(this)
+    this._pinModeChosen = false
+    this._outsideClick  = this.closeDropdowns.bind(this)
     document.addEventListener("click", this._outsideClick)
   }
 

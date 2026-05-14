@@ -11,8 +11,8 @@ class AccessGrant < ApplicationRecord
   scope :revoked, -> { where.not(revoked_at: nil) }
   scope :expired, -> { active.where("ends_at < ?", Time.current) }
 
-  def self.issue!(lock:, tenant:, ends_at:, starts_at: Time.current)
-    pin = rand(1000..9999).to_s
+  def self.issue!(lock:, tenant:, ends_at:, starts_at: Time.current, pin: nil)
+    pin ||= rand(1000..9999).to_s
     grant = create!(
       lock:       lock,
       tenant:     tenant,

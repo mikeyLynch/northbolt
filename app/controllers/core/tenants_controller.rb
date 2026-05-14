@@ -88,6 +88,8 @@ class Core::TenantsController < Core::BaseController
   def process_lock_assignments
     return unless params[:lock_assignments].is_a?(ActionController::Parameters)
 
+    shared_pin = params[:pin_mode] == "shared" ? rand(1000..9999).to_s : nil
+
     params[:lock_assignments].each_value do |attrs|
       next if attrs[:lock_id].blank? || attrs[:ends_at].blank?
 
@@ -98,7 +100,7 @@ class Core::TenantsController < Core::BaseController
       starts_at = attrs[:starts_at].present? ? Date.parse(attrs[:starts_at]) : Date.current
       ends_at   = Date.parse(attrs[:ends_at])
 
-      AccessGrant.issue!(lock: lock, tenant: @tenant, starts_at: starts_at, ends_at: ends_at)
+      AccessGrant.issue!(lock: lock, tenant: @tenant, starts_at: starts_at, ends_at: ends_at, pin: shared_pin)
     rescue ArgumentError, Date::Error
       next
     end
