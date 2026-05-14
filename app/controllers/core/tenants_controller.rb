@@ -10,7 +10,16 @@ class Core::TenantsController < Core::BaseController
       )
     end
 
-    @tenants = tenants.order(:last_name, :first_name).page(params[:page]).per(25).includes(:access_grants)
+    @sort = params[:sort].presence_in(%w[name_asc name_desc newest oldest]) || "name_asc"
+
+    tenants = case @sort
+              when "name_desc" then tenants.order(last_name: :desc, first_name: :desc)
+              when "newest"    then tenants.order(created_at: :desc)
+              when "oldest"    then tenants.order(created_at: :asc)
+              else                  tenants.order(last_name: :asc, first_name: :asc)
+              end
+
+    @tenants = tenants.page(params[:page]).per(25).includes(:access_grants)
     @q = params[:q]
   end
 
