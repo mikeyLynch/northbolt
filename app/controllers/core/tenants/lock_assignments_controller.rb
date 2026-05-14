@@ -7,23 +7,25 @@ class Core::Tenants::LockAssignmentsController < Core::BaseController
 
   def create
     shared_pin = params[:pin_mode] == "shared" ? rand(1000..9999).to_s : nil
+    issued = []
 
     params.fetch(:lock_assignments, {}).each_value do |attrs|
       next if attrs[:lock_id].blank? || attrs[:ends_at].blank?
 
-      lock = current_user.business.locks.find_by(id: attrs[:lock_id])
+      lock = current_user.business.locks.includes(:location).find_by(id: attrs[:lock_id])
       next unless lock
       next if lock.access_grants.where(revoked_at: nil).exists?
 
       starts_at = attrs[:starts_at].present? ? Date.parse(attrs[:starts_at]) : Date.current
       ends_at   = Date.parse(attrs[:ends_at])
 
-      AccessGrant.issue!(lock: lock, tenant: @tenant, starts_at: starts_at, ends_at: ends_at, pin: shared_pin)
-    rescue ArgumentError, Date::Error
+      _, pin = AccessGrant.issue!(lock: lock, tenant: @tenant, starts_at: starts_at, ends_at: ends_at, pin: shared_pin)
+      issued << { "unit_identifier" => lock.unit_identifier, "location_name" => lock.location.name, "pin" => pin }
+    rescue ArgumentError, Date::Error, ActiveRecord::RecordInvalid
       next
     end
 
-    redirect_to core_tenant_path(@tenant)
+    redirect_to core_tenant_path(@tenant), flash: { granted_grants: issued }
   end
 
   private

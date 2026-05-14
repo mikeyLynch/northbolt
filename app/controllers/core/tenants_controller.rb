@@ -15,10 +15,10 @@ class Core::TenantsController < Core::BaseController
     @sort = params[:sort].presence_in(%w[name_asc name_desc newest oldest]) || "name_asc"
 
     tenants = case @sort
-              when "name_desc" then tenants.order(last_name: :desc, first_name: :desc)
-              when "newest"    then tenants.order(created_at: :desc)
-              when "oldest"    then tenants.order(created_at: :asc)
-              else                  tenants.order(last_name: :asc, first_name: :asc)
+    when "name_desc" then tenants.order(last_name: :desc, first_name: :desc)
+    when "newest"    then tenants.order(created_at: :desc)
+    when "oldest"    then tenants.order(created_at: :asc)
+    else                  tenants.order(last_name: :asc, first_name: :asc)
     end
 
     @tenants = tenants.page(params[:page]).per(25).includes(:access_grants)
@@ -52,8 +52,8 @@ class Core::TenantsController < Core::BaseController
     @tenant = current_user.business.tenants.build(tenant_params)
 
     if @tenant.save
-      process_lock_assignments
-      redirect_to core_tenant_path(@tenant)
+      issued = process_lock_assignments
+      redirect_to core_tenant_path(@tenant), flash: { granted_grants: issued }
     else
       @available_locks = available_locks
       render :new, status: :unprocessable_entity
@@ -99,23 +99,27 @@ class Core::TenantsController < Core::BaseController
   end
 
   def process_lock_assignments
-    return unless params[:lock_assignments].is_a?(ActionController::Parameters)
+    return [] unless params[:lock_assignments].is_a?(ActionController::Parameters)
 
     shared_pin = params[:pin_mode] == "shared" ? rand(1000..9999).to_s : nil
+    issued = []
 
     params[:lock_assignments].each_value do |attrs|
       next if attrs[:lock_id].blank? || attrs[:ends_at].blank?
 
-      lock = current_user.business.locks.find_by(id: attrs[:lock_id])
+      lock = current_user.business.locks.includes(:location).find_by(id: attrs[:lock_id])
       next unless lock
       next if lock.access_grants.where(revoked_at: nil).exists?
 
       starts_at = attrs[:starts_at].present? ? Date.parse(attrs[:starts_at]) : Date.current
       ends_at   = Date.parse(attrs[:ends_at])
 
-      AccessGrant.issue!(lock: lock, tenant: @tenant, starts_at: starts_at, ends_at: ends_at, pin: shared_pin)
+      _, pin = AccessGrant.issue!(lock: lock, tenant: @tenant, starts_at: starts_at, ends_at: ends_at, pin: shared_pin)
+      issued << { "unit_identifier" => lock.unit_identifier, "location_name" => lock.location.name, "pin" => pin }
     rescue ArgumentError, Date::Error
       next
     end
+
+    issued
   end
 end
