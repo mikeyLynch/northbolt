@@ -16,6 +16,7 @@
         data: {
           controller: "lock-picker",
           lock_picker_locks_value: @available_locks.map { |l| { id: l.id, unit_identifier: l.unit_identifier, location_name: l.location.name } }.to_json,
+          lock_picker_auto_row_value: true,
           action: "submit->lock-picker#interceptSubmit"
         } do %>
 

@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static targets = ["rows", "template", "modal", "pinModeInput"]
-  static values  = { locks: Array }
+  static values  = { locks: Array, autoRow: Boolean }
 
   addRow() {
     const index = Date.now()
@@ -89,6 +89,7 @@ export default class extends Controller {
     this._pinModeChosen = false
     this._outsideClick  = this.closeDropdowns.bind(this)
     document.addEventListener("click", this._outsideClick)
+    if (this.autoRowValue) this.addRow()
   }
 
   disconnect() {
