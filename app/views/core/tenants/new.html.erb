@@ -1,0 +1,119 @@
+<% content_for :title, "Add tenant" %>
+
+<div class="max-w-3xl mx-auto space-y-6">
+
+  <div class="flex items-center gap-3">
+    <%= link_to core_tenants_path, class: "text-gray-400 hover:text-gray-900 transition-colors" do %>
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+      </svg>
+    <% end %>
+    <h1 class="text-lg font-semibold text-gray-900">Add tenant</h1>
+  </div>
+
+  <%= form_with model: [:core, @tenant], class: "space-y-6" do |f| %>
+
+    <% if @tenant.errors.any? %>
+      <div class="px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-sm text-red-700 space-y-1">
+        <% @tenant.errors.full_messages.each do |msg| %>
+          <p><%= msg %></p>
+        <% end %>
+      </div>
+    <% end %>
+
+    <!-- Core details -->
+    <div class="bg-white border border-gray-200 rounded-xl divide-y divide-gray-100">
+      <div class="px-4 py-3 grid grid-cols-2 gap-3">
+        <div class="space-y-1">
+          <%= f.label :first_name, class: "block text-xs font-medium text-gray-500" %>
+          <%= f.text_field :first_name,
+                class: "w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent",
+                autocomplete: "off" %>
+        </div>
+        <div class="space-y-1">
+          <%= f.label :last_name, class: "block text-xs font-medium text-gray-500" %>
+          <%= f.text_field :last_name,
+                class: "w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent",
+                autocomplete: "off" %>
+        </div>
+      </div>
+      <div class="px-4 py-3 space-y-1">
+        <%= f.label :email, class: "block text-xs font-medium text-gray-500" %>
+        <%= f.email_field :email,
+              class: "w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent",
+              autocomplete: "off" %>
+      </div>
+      <div class="px-4 py-3 space-y-1">
+        <%= f.label :phone, class: "block text-xs font-medium text-gray-500" %>
+        <%= f.telephone_field :phone,
+              class: "w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent",
+              autocomplete: "off" %>
+      </div>
+    </div>
+
+    <!-- Lock assignment -->
+    <div class="space-y-3"
+         data-controller="lock-picker"
+         data-lock-picker-locks-value="<%= @available_locks.map { |l| { id: l.id, unit_identifier: l.unit_identifier, location_name: l.location.name } }.to_json %>">
+
+      <div class="flex items-center justify-between">
+        <h2 class="text-sm font-medium text-gray-900">Assign locks <span class="text-gray-400 font-normal">(optional)</span></h2>
+        <button type="button"
+                data-action="lock-picker#addRow"
+                class="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">
+          + Add lock
+        </button>
+      </div>
+
+      <div data-lock-picker-target="rows" class="space-y-2"></div>
+
+      <template data-lock-picker-target="template">
+        <div class="bg-white border border-gray-200 rounded-xl p-3 flex gap-2 items-start" data-lock-picker-row>
+          <div class="relative flex-1 min-w-0">
+            <input type="text"
+                   placeholder="Search by unit number or location…"
+                   autocomplete="off"
+                   data-lock-search
+                   data-action="input->lock-picker#filter focus->lock-picker#filter"
+                   class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent">
+            <input type="hidden" name="lock_assignments[INDEX][lock_id]" data-lock-id-input>
+            <div data-lock-dropdown
+                 class="hidden absolute z-10 top-full mt-1 left-0 right-0 bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+            </div>
+          </div>
+          <div class="space-y-1 shrink-0">
+            <p class="text-xs font-medium text-gray-500">From</p>
+            <input type="date"
+                   name="lock_assignments[INDEX][starts_at]"
+                   value="<%= Date.current.iso8601 %>"
+                   class="px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent">
+          </div>
+          <div class="space-y-1 shrink-0">
+            <p class="text-xs font-medium text-gray-500">Until</p>
+            <input type="date"
+                   name="lock_assignments[INDEX][ends_at]"
+                   class="px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent">
+          </div>
+          <button type="button"
+                  data-action="lock-picker#removeRow"
+                  class="mt-7 p-1.5 text-gray-400 hover:text-gray-700 rounded-lg hover:bg-gray-100 transition-colors shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </template>
+
+      <% if @available_locks.empty? %>
+        <p class="text-sm text-gray-400">All locks currently have active tenants.</p>
+      <% end %>
+    </div>
+
+    <div class="flex gap-2 justify-end">
+      <%= link_to "Cancel", core_tenants_path, class: "px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors" %>
+      <%= f.submit "Add tenant", class: "px-4 py-2 text-sm font-medium bg-gray-900 text-white rounded-lg hover:bg-gray-700 transition-colors cursor-pointer" %>
+    </div>
+
+  <% end %>
+
+</div>

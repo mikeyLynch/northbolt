@@ -10,10 +10,13 @@ RSpec.describe Tenant, type: :model do
   describe "validations" do
     it { is_expected.to validate_presence_of(:first_name) }
     it { is_expected.to validate_presence_of(:last_name) }
-    it { is_expected.to validate_presence_of(:email) }
-    it { is_expected.to validate_presence_of(:phone) }
 
-    it "enforces email uniqueness within a business" do
+    it "allows blank email and phone" do
+      tenant = build(:tenant, email: "", phone: "")
+      expect(tenant).to be_valid
+    end
+
+    it "enforces email uniqueness within a business when present" do
       business = create(:business)
       create(:tenant, business: business, email: "same@example.com")
       duplicate = build(:tenant, business: business, email: "same@example.com")
@@ -23,6 +26,20 @@ RSpec.describe Tenant, type: :model do
     it "allows the same email across different businesses" do
       create(:tenant, email: "same@example.com")
       other = build(:tenant, email: "same@example.com")
+      expect(other).to be_valid
+    end
+
+    it "enforces phone uniqueness within a business when present" do
+      business = create(:business)
+      create(:tenant, business: business, phone: "07700900001")
+      duplicate = build(:tenant, business: business, phone: "07700900001")
+      expect(duplicate).not_to be_valid
+    end
+
+    it "allows blank phones to coexist within the same business" do
+      business = create(:business)
+      create(:tenant, business: business, phone: "")
+      other = build(:tenant, business: business, phone: "")
       expect(other).to be_valid
     end
   end

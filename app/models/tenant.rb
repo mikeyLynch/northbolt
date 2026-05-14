@@ -5,9 +5,8 @@ class Tenant < ApplicationRecord
 
   validates :first_name, presence: true
   validates :last_name,  presence: true
-  validates :phone,      presence: true
-  validates :email,      presence: true,
-                         uniqueness: { scope: :business_id, case_sensitive: false }
+  validates :email,      uniqueness: { scope: :business_id, case_sensitive: false, allow_blank: true }
+  validates :phone,      uniqueness: { scope: :business_id, allow_blank: true }
 
   def full_name
     "#{first_name} #{last_name}"

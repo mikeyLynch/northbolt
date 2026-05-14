@@ -4,6 +4,8 @@
 
   <div class="flex items-center justify-between">
     <h1 class="text-lg font-semibold text-gray-900">Tenants</h1>
+    <%= link_to "Add tenant", new_core_tenant_path,
+          class: "px-3 py-2 text-sm font-medium bg-gray-900 text-white rounded-lg hover:bg-gray-700 transition-colors" %>
   </div>
 
   <%= form_with url: core_tenants_path, method: :get, data: { controller: "search" } do |f| %>

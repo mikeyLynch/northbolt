@@ -16,7 +16,7 @@ Rails.application.routes.draw do
     resources :locks, only: [ :index, :show ] do
       resources :access_grants, only: [ :new, :create ], module: :locks
     end
-    resources :tenants, only: [ :index, :show ] do
+    resources :tenants, only: %i[ index show new create edit update destroy ] do
       resources :access_grants, only: [ :new, :create ], module: :tenants
     end
   end
