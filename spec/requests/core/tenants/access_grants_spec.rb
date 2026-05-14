@@ -41,7 +41,7 @@ RSpec.describe "Core::Tenants::AccessGrants", type: :request do
     it "does not grant access to an already occupied lock" do
       create(:access_grant, lock: lock, tenant: create(:tenant, business: business))
       post core_tenant_access_grants_path(tenant), params: valid_params
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
     end
   end
 end

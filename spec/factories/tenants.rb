@@ -4,6 +4,6 @@ FactoryBot.define do
     first_name { "Jane" }
     last_name  { "Smith" }
     sequence(:email) { |n| "tenant#{n}@example.com" }
-    phone { "07700900000" }
+    sequence(:phone) { |n| "0770090#{n.to_s.rjust(4, '0')}" }
   end
 end

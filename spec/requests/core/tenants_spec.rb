@@ -97,7 +97,7 @@ RSpec.describe "Core::Tenants", type: :request do
     context "with invalid params" do
       it "re-renders new with unprocessable entity" do
         post core_tenants_path, params: { tenant: { first_name: "", last_name: "" } }
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
     end
 
@@ -156,7 +156,7 @@ RSpec.describe "Core::Tenants", type: :request do
 
     it "re-renders edit with unprocessable entity on invalid params" do
       patch core_tenant_path(tenant), params: { tenant: { first_name: "" } }
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
     end
 
     it "cannot update another business's tenant" do

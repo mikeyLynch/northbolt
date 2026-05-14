@@ -26,8 +26,21 @@ class Core::TenantsController < Core::BaseController
   end
 
   def show
-    @tab = params[:tab].presence_in(%w[details history]) || "details"
-    @access_grants = @tenant.access_grants.includes(lock: :location).order(created_at: :desc) if @tab == "history"
+    @tab = params[:tab].presence_in(%w[details locks audit]) || "details"
+
+    case @tab
+    when "locks"
+      @access_grants = @tenant.access_grants
+        .includes(lock: :location)
+        .order(Arel.sql("CASE WHEN revoked_at IS NULL AND ends_at > NOW() THEN 0 ELSE 1 END, created_at DESC"))
+    when "details"
+      @active_grants = @tenant.access_grants
+        .joins(lock: :location)
+        .includes(lock: :location)
+        .where(revoked_at: nil)
+        .where("ends_at > ?", Time.current)
+        .order(Arel.sql("locations.name, length(locks.unit_identifier), locks.unit_identifier"))
+    end
   end
 
   def new

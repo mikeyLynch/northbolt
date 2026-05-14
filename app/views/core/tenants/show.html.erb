@@ -28,22 +28,28 @@
     </div>
   <% end %>
 
-  <!-- Tabs -->
-  <div class="flex gap-1 border-b border-gray-200">
-    <%= link_to "Details", core_tenant_path(@tenant, tab: "details"),
-          class: "px-4 py-2 text-sm font-medium border-b-2 transition-colors #{@tab == 'details' ? 'border-gray-900 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-900'}",
-          data: { turbo_frame: "tenant_tab", turbo_action: "advance" } %>
-    <%= link_to "Access history", core_tenant_path(@tenant, tab: "history"),
-          class: "px-4 py-2 text-sm font-medium border-b-2 transition-colors #{@tab == 'history' ? 'border-gray-900 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-900'}",
-          data: { turbo_frame: "tenant_tab", turbo_action: "advance" } %>
-  </div>
-
   <turbo-frame id="tenant_tab">
-    <% if @tab == "history" %>
-      <%= render "history" %>
-    <% else %>
-      <%= render "details" %>
-    <% end %>
+    <div class="space-y-6">
+      <div class="flex gap-1 border-b border-gray-200">
+        <%= link_to "Details", core_tenant_path(@tenant, tab: "details"),
+              class: "px-4 py-2 text-sm font-medium border-b-2 transition-colors #{@tab == 'details' ? 'border-gray-900 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-900'}",
+              data: { turbo_frame: "tenant_tab", turbo_action: "advance" } %>
+        <%= link_to "Lock history", core_tenant_path(@tenant, tab: "locks"),
+              class: "px-4 py-2 text-sm font-medium border-b-2 transition-colors #{@tab == 'locks' ? 'border-gray-900 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-900'}",
+              data: { turbo_frame: "tenant_tab", turbo_action: "advance" } %>
+        <%= link_to "Audit trail", core_tenant_path(@tenant, tab: "audit"),
+              class: "px-4 py-2 text-sm font-medium border-b-2 transition-colors #{@tab == 'audit' ? 'border-gray-900 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-900'}",
+              data: { turbo_frame: "tenant_tab", turbo_action: "advance" } %>
+      </div>
+
+      <% if @tab == "locks" %>
+        <%= render "locks" %>
+      <% elsif @tab == "audit" %>
+        <%= render "audit" %>
+      <% else %>
+        <%= render "details" %>
+      <% end %>
+    </div>
   </turbo-frame>
 
 </div>

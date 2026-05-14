@@ -1,18 +1,47 @@
-<div class="bg-white border border-gray-200 rounded-xl divide-y divide-gray-100">
-  <div class="px-4 py-3 flex items-center justify-between">
-    <span class="text-sm text-gray-500">Full name</span>
-    <span class="text-sm font-medium text-gray-900"><%= @tenant.full_name %></span>
+<div class="space-y-6">
+
+  <div class="bg-white border border-gray-200 rounded-xl divide-y divide-gray-100">
+    <div class="px-4 py-3 flex items-center justify-between">
+      <span class="text-sm text-gray-500">Full name</span>
+      <span class="text-sm font-medium text-gray-900"><%= @tenant.full_name %></span>
+    </div>
+    <div class="px-4 py-3 flex items-center justify-between">
+      <span class="text-sm text-gray-500">Email</span>
+      <span class="text-sm text-gray-900"><%= @tenant.email.presence || "—" %></span>
+    </div>
+    <div class="px-4 py-3 flex items-center justify-between">
+      <span class="text-sm text-gray-500">Phone</span>
+      <span class="text-sm text-gray-900"><%= @tenant.phone.presence || "—" %></span>
+    </div>
+    <div class="px-4 py-3 flex items-center justify-between">
+      <span class="text-sm text-gray-500">Added</span>
+      <span class="text-sm text-gray-900"><%= @tenant.created_at.strftime("%-d %B %Y") %></span>
+    </div>
   </div>
-  <div class="px-4 py-3 flex items-center justify-between">
-    <span class="text-sm text-gray-500">Email</span>
-    <span class="text-sm text-gray-900"><%= @tenant.email %></span>
+
+  <div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
+    <div class="px-4 py-3 border-b border-gray-100">
+      <h2 class="text-sm font-medium text-gray-900">Current locks</h2>
+    </div>
+    <% if @active_grants.any? %>
+      <table class="w-full text-sm">
+        <tbody class="divide-y divide-gray-100">
+          <% @active_grants.each do |grant| %>
+            <tr class="hover:bg-gray-50 transition-colors">
+              <td class="px-4 py-3 font-medium text-gray-900">
+                <%= link_to "Unit #{grant.lock.unit_identifier}", core_lock_path(grant.lock), class: "hover:underline" %>
+              </td>
+              <td class="px-4 py-3 text-gray-500 hidden sm:table-cell"><%= grant.lock.location.name %></td>
+              <td class="px-4 py-3 text-gray-500 text-right">
+                Until <%= grant.ends_at.strftime("%-d %b %Y") %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% else %>
+      <div class="px-4 py-8 text-center text-sm text-gray-400">No active locks.</div>
+    <% end %>
   </div>
-  <div class="px-4 py-3 flex items-center justify-between">
-    <span class="text-sm text-gray-500">Phone</span>
-    <span class="text-sm text-gray-900"><%= @tenant.phone %></span>
-  </div>
-  <div class="px-4 py-3 flex items-center justify-between">
-    <span class="text-sm text-gray-500">Added</span>
-    <span class="text-sm text-gray-900"><%= @tenant.created_at.strftime("%-d %B %Y") %></span>
-  </div>
+
 </div>
