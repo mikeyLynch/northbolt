@@ -66,6 +66,7 @@
             <th class="px-4 py-3 text-left font-medium text-gray-500 hidden sm:table-cell">Device UUID</th>
             <th class="px-4 py-3 text-left font-medium text-gray-500 hidden md:table-cell">Connection</th>
             <th class="px-4 py-3 text-left font-medium text-gray-500 hidden md:table-cell">Status</th>
+            <th class="px-4 py-3 text-left font-medium text-gray-500">Tenancy</th>
             <th class="px-4 py-3"></th>
           </tr>
         </thead>
@@ -113,6 +114,18 @@
                   </span>
                 <% else %>
                   <span class="text-xs text-gray-400">Unknown</span>
+                <% end %>
+              </td>
+              <td class="px-4 py-3">
+                <% case @tenancy_statuses[lock.id] %>
+                <% when "unavailable" %>
+                  <span class="text-xs text-gray-500">Unavailable</span>
+                <% when "unavailable_soon" %>
+                  <span class="text-xs font-medium text-amber-600">Unavailable soon</span>
+                <% when "available_soon" %>
+                  <span class="text-xs font-medium text-sky-600">Available soon</span>
+                <% else %>
+                  <span class="text-xs font-medium text-green-600">Available</span>
                 <% end %>
               </td>
               <td class="px-4 py-3 text-right">

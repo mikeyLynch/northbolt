@@ -32,7 +32,22 @@
   <!-- Lock details -->
   <div class="bg-white border border-gray-200 rounded-xl divide-y divide-gray-100">
     <div class="px-4 py-3 flex items-center justify-between">
-      <span class="text-sm text-gray-500">Current tenant</span>
+      <span class="text-sm text-gray-500">Tenancy</span>
+      <span class="text-sm">
+        <% case @tenancy_status %>
+        <% when "unavailable" %>
+          <span class="text-xs text-gray-500">Unavailable</span>
+        <% when "unavailable_soon" %>
+          <span class="text-xs font-medium text-amber-600">Unavailable soon</span>
+        <% when "available_soon" %>
+          <span class="text-xs font-medium text-sky-600">Available soon</span>
+        <% else %>
+          <span class="text-xs font-medium text-green-600">Available</span>
+        <% end %>
+      </span>
+    </div>
+    <div class="px-4 py-3 flex items-center justify-between">
+      <span class="text-sm text-gray-500"><%= @tenancy_status == "unavailable_soon" ? "Upcoming tenant" : "Current tenant" %></span>
       <span class="text-sm text-gray-900">
         <% if @lock.current_tenant %>
           <%= link_to @lock.current_tenant.full_name, core_tenant_path(@lock.current_tenant),
