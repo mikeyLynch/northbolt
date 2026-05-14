@@ -6,7 +6,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: lock_mono_development
+      POSTGRES_DB: northbolt_development
     ports:
       - "5432:5432"
     volumes:
