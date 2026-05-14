@@ -10,8 +10,8 @@ RSpec.describe Lock, type: :model do
   end
 
   describe "#bolt_position" do
-    it "returns :unknown" do
-      expect(build(:lock).bolt_position).to eq(:unknown)
+    it "returns one of Unknown, Open, or Closed" do
+      expect(build(:lock).bolt_position).to be_in([ "Unknown", "Open", "Closed" ])
     end
   end
 

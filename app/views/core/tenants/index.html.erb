@@ -26,7 +26,7 @@
             <th class="px-4 py-3 text-left font-medium text-gray-500">Name</th>
             <th class="px-4 py-3 text-left font-medium text-gray-500 hidden sm:table-cell">Email</th>
             <th class="px-4 py-3 text-left font-medium text-gray-500 hidden md:table-cell">Phone</th>
-            <th class="px-4 py-3 text-left font-medium text-gray-500 hidden md:table-cell">Active grants</th>
+            <th class="px-4 py-3 text-left font-medium text-gray-500 hidden md:table-cell">Locks</th>
             <th class="px-4 py-3"></th>
           </tr>
         </thead>
@@ -37,9 +37,12 @@
               <td class="px-4 py-3 text-gray-500 hidden sm:table-cell"><%= tenant.email %></td>
               <td class="px-4 py-3 text-gray-500 hidden md:table-cell"><%= tenant.phone %></td>
               <td class="px-4 py-3 hidden md:table-cell">
-                <% count = tenant.access_grants.active.count %>
-                <% if count > 0 %>
-                  <span class="text-xs font-medium text-green-600"><%= count %> active</span>
+                <% active     = tenant.access_grants.count { |g| g.revoked_at.nil? && g.ends_at > Time.current } %>
+                <% historical = tenant.access_grants.count { |g| g.revoked_at.present? || g.ends_at <= Time.current } %>
+                <% if active > 0 %>
+                  <span class="text-xs font-medium text-green-600"><%= active %> active</span>
+                <% elsif historical > 0 %>
+                  <span class="text-xs text-gray-400"><%= historical %> historical</span>
                 <% else %>
                   <span class="text-xs text-gray-400">None</span>
                 <% end %>

@@ -46,6 +46,26 @@ RSpec.describe AccessGrant, type: :model do
     end
   end
 
+  describe ".issue!" do
+    it "creates a grant and returns it with the plaintext PIN" do
+      lock   = create(:lock)
+      tenant = create(:tenant)
+      grant, pin = AccessGrant.issue!(lock: lock, tenant: tenant, ends_at: 1.month.from_now)
+
+      expect(grant).to be_persisted
+      expect(pin).to match(/\A\d{4}\z/)
+      expect(BCrypt::Password.new(grant.pin_digest)).to eq(pin)
+    end
+
+    it "does not store the plaintext PIN" do
+      lock   = create(:lock)
+      tenant = create(:tenant)
+      grant, pin = AccessGrant.issue!(lock: lock, tenant: tenant, ends_at: 1.month.from_now)
+
+      expect(grant.pin_digest).not_to eq(pin)
+    end
+  end
+
   describe "#active? / #revoked?" do
     it "is active when revoked_at is nil" do
       grant = build(:access_grant)

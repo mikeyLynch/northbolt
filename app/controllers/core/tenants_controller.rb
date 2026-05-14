@@ -10,7 +10,7 @@ class Core::TenantsController < Core::BaseController
       )
     end
 
-    @tenants = tenants.order(:last_name, :first_name).page(params[:page]).per(25)
+    @tenants = tenants.order(:last_name, :first_name).page(params[:page]).per(25).includes(:access_grants)
     @q = params[:q]
   end
 
