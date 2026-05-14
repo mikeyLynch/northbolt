@@ -1,0 +1,72 @@
+<div class="space-y-6">
+
+  <div class="bg-white border border-gray-200 rounded-xl divide-y divide-gray-100">
+    <div class="px-4 py-3 flex items-center justify-between">
+      <span class="text-sm text-gray-500">Tenancy</span>
+      <span class="text-sm">
+        <% case @tenancy_status %>
+        <% when "unavailable" %>
+          <span class="text-xs text-gray-500">Unavailable</span>
+        <% when "unavailable_soon" %>
+          <span class="text-xs font-medium text-amber-600">Unavailable soon</span>
+        <% when "available_soon" %>
+          <span class="text-xs font-medium text-sky-600">Available soon</span>
+        <% else %>
+          <span class="text-xs font-medium text-green-600">Available</span>
+        <% end %>
+      </span>
+    </div>
+    <div class="px-4 py-3 flex items-center justify-between">
+      <span class="text-sm text-gray-500">Location</span>
+      <span class="text-sm text-gray-900"><%= @lock.location.name %></span>
+    </div>
+    <div class="px-4 py-3 flex items-center justify-between">
+      <span class="text-sm text-gray-500">Device UUID</span>
+      <span class="text-sm font-mono text-gray-900"><%= @lock.device_uuid %></span>
+    </div>
+    <div class="px-4 py-3 flex items-center justify-between">
+      <span class="text-sm text-gray-500">Added</span>
+      <span class="text-sm text-gray-900"><%= @lock.created_at.strftime("%-d %B %Y") %></span>
+    </div>
+  </div>
+
+  <div class="bg-white border border-gray-200 rounded-xl divide-y divide-gray-100">
+    <div class="px-4 py-3">
+      <% if @current_grant.nil? %>
+        <h2 class="text-sm font-medium text-gray-900">No access granted</h2>
+      <% elsif @tenancy_status == "unavailable_soon" %>
+        <h2 class="text-sm font-medium text-gray-900">Upcoming access grant</h2>
+      <% else %>
+        <h2 class="text-sm font-medium text-gray-900">Current access grant</h2>
+      <% end %>
+    </div>
+    <% if @current_grant %>
+      <div class="px-4 py-3 flex items-center justify-between">
+        <span class="text-sm text-gray-500">Tenant</span>
+        <%= link_to @current_grant.tenant.full_name, core_tenant_path(@current_grant.tenant),
+              class: "text-sm font-medium text-gray-900 hover:underline", data: { turbo_frame: "_top" } %>
+      </div>
+      <div class="px-4 py-3 flex items-center justify-between">
+        <span class="text-sm text-gray-500">From</span>
+        <span class="text-sm text-gray-900"><%= @current_grant.starts_at.strftime("%-d %B %Y") %></span>
+      </div>
+      <div class="px-4 py-3 flex items-center justify-between">
+        <span class="text-sm text-gray-500">Until</span>
+        <span class="text-sm text-gray-900"><%= @current_grant.ends_at.strftime("%-d %B %Y") %></span>
+      </div>
+      <div class="px-4 py-3 flex items-center justify-between">
+        <span class="text-sm text-gray-500">Status</span>
+        <% if @tenancy_status == "unavailable_soon" %>
+          <span class="text-xs font-medium text-amber-600">Upcoming</span>
+        <% elsif @tenancy_status == "available_soon" %>
+          <span class="text-xs font-medium text-sky-600">Ending soon</span>
+        <% else %>
+          <span class="text-xs font-medium text-green-600">Active</span>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="px-4 py-8 text-center text-sm text-gray-400">No active or upcoming access grant.</div>
+    <% end %>
+  </div>
+
+</div>

@@ -19,7 +19,7 @@ class Core::LocksController < Core::BaseController
             when "unit_desc"                               then locks.order(Arel.sql("length(unit_identifier) DESC, unit_identifier DESC"))
             when "last_accessed_asc", "last_accessed_desc" then locks.order(Arel.sql("length(unit_identifier), unit_identifier"))
             else                                                locks.order(Arel.sql("length(unit_identifier), unit_identifier"))
-            end
+    end
 
     @locks = locks.page(params[:page]).per(25)
     @q = params[:q]
@@ -28,8 +28,19 @@ class Core::LocksController < Core::BaseController
 
   def show
     @lock = current_user.business.locks.includes(:location, :current_tenant).find(params[:id])
-    @access_grants = @lock.access_grants.includes(:tenant).order(created_at: :desc)
     @tenancy_status = @lock.tenancy_status
+    @tab = params[:tab].presence_in(%w[overview history audit]) || "overview"
+
+    case @tab
+    when "overview"
+      @current_grant = @lock.access_grants.includes(:tenant)
+                            .where(revoked_at: nil)
+                            .where("ends_at > ?", Time.current)
+                            .order(:starts_at)
+                            .first
+    when "history"
+      @access_grants = @lock.access_grants.includes(:tenant).order(created_at: :desc)
+    end
   end
 
   private

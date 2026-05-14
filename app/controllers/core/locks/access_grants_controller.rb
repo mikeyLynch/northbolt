@@ -7,12 +7,13 @@ class Core::Locks::AccessGrantsController < Core::BaseController
   end
 
   def create
-    ends_at = Date.parse(params[:access_grant][:ends_at]).end_of_day
-    tenant  = find_or_build_tenant
+    starts_at = Date.parse(params[:access_grant][:starts_at]).beginning_of_day
+    ends_at   = Date.parse(params[:access_grant][:ends_at]).end_of_day
+    tenant    = find_or_build_tenant
 
     return render :new, status: :unprocessable_entity unless tenant.save
 
-    grant, pin = AccessGrant.issue!(lock: @lock, tenant: tenant, ends_at: ends_at)
+    grant, pin = AccessGrant.issue!(lock: @lock, tenant: tenant, starts_at: starts_at, ends_at: ends_at)
     flash[:granted_pin] = pin
     redirect_to core_lock_path(@lock)
   rescue ActiveRecord::RecordInvalid => e

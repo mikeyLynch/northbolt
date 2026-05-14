@@ -11,9 +11,11 @@
       <% end %>
       <h1 class="text-lg font-semibold text-gray-900">Unit <%= @lock.unit_identifier %></h1>
     </div>
-    <% unless @lock.current_tenant %>
+    <% if @tenancy_status == "available" %>
       <%= link_to "Assign tenant", new_core_lock_access_grant_path(@lock),
             class: "px-3 py-2 text-sm font-medium bg-gray-900 text-white rounded-lg hover:bg-gray-700 transition-colors" %>
+    <% else %>
+      <span class="px-3 py-2 text-sm font-medium bg-gray-100 text-gray-400 rounded-lg cursor-not-allowed">Assign tenant</span>
     <% end %>
   </div>
 
@@ -29,85 +31,28 @@
     <div class="px-4 py-3 rounded-lg bg-red-50 text-sm text-red-600"><%= flash[:alert] %></div>
   <% end %>
 
-  <!-- Lock details -->
-  <div class="bg-white border border-gray-200 rounded-xl divide-y divide-gray-100">
-    <div class="px-4 py-3 flex items-center justify-between">
-      <span class="text-sm text-gray-500">Tenancy</span>
-      <span class="text-sm">
-        <% case @tenancy_status %>
-        <% when "unavailable" %>
-          <span class="text-xs text-gray-500">Unavailable</span>
-        <% when "unavailable_soon" %>
-          <span class="text-xs font-medium text-amber-600">Unavailable soon</span>
-        <% when "available_soon" %>
-          <span class="text-xs font-medium text-sky-600">Available soon</span>
-        <% else %>
-          <span class="text-xs font-medium text-green-600">Available</span>
-        <% end %>
-      </span>
-    </div>
-    <div class="px-4 py-3 flex items-center justify-between">
-      <span class="text-sm text-gray-500"><%= @tenancy_status == "unavailable_soon" ? "Upcoming tenant" : "Current tenant" %></span>
-      <span class="text-sm text-gray-900">
-        <% if @lock.current_tenant %>
-          <%= link_to @lock.current_tenant.full_name, core_tenant_path(@lock.current_tenant),
-                class: "font-medium hover:underline" %>
-        <% else %>
-          <span class="text-gray-400">Unoccupied</span>
-        <% end %>
-      </span>
-    </div>
-    <div class="px-4 py-3 flex items-center justify-between">
-      <span class="text-sm text-gray-500">Location</span>
-      <span class="text-sm text-gray-900"><%= @lock.location.name %></span>
-    </div>
-    <div class="px-4 py-3 flex items-center justify-between">
-      <span class="text-sm text-gray-500">Device UUID</span>
-      <span class="text-sm font-mono text-gray-900"><%= @lock.device_uuid %></span>
-    </div>
-    <div class="px-4 py-3 flex items-center justify-between">
-      <span class="text-sm text-gray-500">Added</span>
-      <span class="text-sm text-gray-900"><%= @lock.created_at.strftime("%-d %B %Y") %></span>
-    </div>
-  </div>
+  <turbo-frame id="lock_tab">
+    <div class="space-y-6">
+      <div class="flex gap-1 border-b border-gray-200">
+        <%= link_to "Overview", core_lock_path(@lock, tab: "overview"),
+              class: "px-4 py-2 text-sm font-medium border-b-2 transition-colors #{@tab == 'overview' ? 'border-gray-900 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-900'}",
+              data: { turbo_frame: "lock_tab", turbo_action: "advance" } %>
+        <%= link_to "Historical access grants", core_lock_path(@lock, tab: "history"),
+              class: "px-4 py-2 text-sm font-medium border-b-2 transition-colors #{@tab == 'history' ? 'border-gray-900 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-900'}",
+              data: { turbo_frame: "lock_tab", turbo_action: "advance" } %>
+        <%= link_to "Audit trail", core_lock_path(@lock, tab: "audit"),
+              class: "px-4 py-2 text-sm font-medium border-b-2 transition-colors #{@tab == 'audit' ? 'border-gray-900 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-900'}",
+              data: { turbo_frame: "lock_tab", turbo_action: "advance" } %>
+      </div>
 
-  <!-- Access history -->
-  <div class="space-y-3">
-    <h2 class="text-sm font-semibold text-gray-700">Access history</h2>
-    <div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
-      <% if @access_grants.any? %>
-        <table class="w-full text-sm">
-          <thead>
-            <tr class="border-b border-gray-100 bg-gray-50">
-              <th class="px-4 py-3 text-left font-medium text-gray-500">Tenant</th>
-              <th class="px-4 py-3 text-left font-medium text-gray-500">From</th>
-              <th class="px-4 py-3 text-left font-medium text-gray-500 hidden sm:table-cell">Until</th>
-              <th class="px-4 py-3 text-left font-medium text-gray-500">Status</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-gray-100">
-            <% @access_grants.each do |grant| %>
-              <tr class="hover:bg-gray-50 transition-colors">
-                <td class="px-4 py-3 font-medium text-gray-900">
-                  <%= link_to grant.tenant.full_name, core_tenant_path(grant.tenant), class: "hover:underline" %>
-                </td>
-                <td class="px-4 py-3 text-gray-500"><%= grant.starts_at.strftime("%-d %b %Y") %></td>
-                <td class="px-4 py-3 text-gray-500 hidden sm:table-cell"><%= grant.ends_at.strftime("%-d %b %Y") %></td>
-                <td class="px-4 py-3">
-                  <% if grant.active? %>
-                    <span class="text-xs font-medium text-green-600">Active</span>
-                  <% else %>
-                    <span class="text-xs text-gray-400">Revoked</span>
-                  <% end %>
-                </td>
-              </tr>
-            <% end %>
-          </tbody>
-        </table>
+      <% if @tab == "history" %>
+        <%= render "history" %>
+      <% elsif @tab == "audit" %>
+        <%= render "audit" %>
       <% else %>
-        <div class="px-4 py-12 text-center text-sm text-gray-400">No access history yet.</div>
+        <%= render "overview" %>
       <% end %>
     </div>
-  </div>
+  </turbo-frame>
 
 </div>
