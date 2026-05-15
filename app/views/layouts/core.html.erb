@@ -110,6 +110,9 @@
           <a href="#" class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-900">
             Account settings
           </a>
+          <%= link_to core_developers_path, class: "flex items-center gap-3 px-4 py-2.5 text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-900" do %>
+            Developers
+          <% end %>
           <div class="border-t border-gray-100"></div>
           <%= button_to "Sign out", destroy_user_session_path, method: :delete,
                 class: "w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-900 text-left" %>

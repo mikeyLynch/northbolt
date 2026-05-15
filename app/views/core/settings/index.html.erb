@@ -4,8 +4,27 @@
 
   <h1 class="text-lg font-semibold text-gray-900">Settings</h1>
 
-  <div class="bg-white border border-gray-200 rounded-xl px-4 py-12 text-center text-sm text-gray-400">
-    Settings coming soon.
-  </div>
+  <turbo-frame id="settings_tab">
+    <div class="space-y-6">
+      <div class="flex gap-1 border-b border-gray-200">
+        <%= link_to "General", core_settings_path(tab: "general"),
+              class: "px-4 py-2 text-sm font-medium border-b-2 transition-colors #{@tab == 'general' ? 'border-gray-900 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-900'}",
+              data: { turbo_frame: "settings_tab", turbo_action: "advance" } %>
+        <%= link_to "API keys", core_settings_path(tab: "api_keys"),
+              class: "px-4 py-2 text-sm font-medium border-b-2 transition-colors #{@tab == 'api_keys' ? 'border-gray-900 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-900'}",
+              data: { turbo_frame: "settings_tab", turbo_action: "advance" } %>
+      </div>
+
+      <% if @tab == "api_keys" %>
+        <div class="bg-white border border-gray-200 rounded-xl px-4 py-12 text-center text-sm text-gray-400">
+          API keys coming soon.
+        </div>
+      <% else %>
+        <div class="bg-white border border-gray-200 rounded-xl px-4 py-12 text-center text-sm text-gray-400">
+          General settings coming soon.
+        </div>
+      <% end %>
+    </div>
+  </turbo-frame>
 
 </div>

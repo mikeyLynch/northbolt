@@ -11,6 +11,7 @@ Rails.application.routes.draw do
     get  "dashboard",              to: "dashboard#index",       as: :dashboard
     get  "billing",                to: "billing#index",         as: :billing
     get  "settings",               to: "settings#index",        as: :settings
+    get  "developers",             to: "developers#index",      as: :developers
     get  "notifications",          to: "notifications#index",   as: :notifications
     get  "notifications/unread_count", to: "notifications#unread_count", as: :notifications_unread_count
     patch "notifications/read_all", to: "notifications#read_all", as: :notifications_read_all
