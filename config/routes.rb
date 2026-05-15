@@ -9,6 +9,7 @@ Rails.application.routes.draw do
 
   namespace :core, path: "" do
     get  "dashboard",              to: "dashboard#index",       as: :dashboard
+    get  "activity",               to: "activity#index",        as: :activity
     get  "billing",                to: "billing#index",         as: :billing
     get  "settings",               to: "settings#index",        as: :settings
     get  "developers",             to: "developers#index",      as: :developers
