@@ -20,6 +20,9 @@ Rails.application.routes.draw do
       resource  :lock_assignments, only: %i[ new create ], module: :tenants
       resources :access_grants,    only: %i[ new create ], module: :tenants
     end
+    resources :access_grants, only: %i[ edit update ] do
+      member { patch :revoke }
+    end
   end
 
   namespace :api do

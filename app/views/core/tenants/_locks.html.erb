@@ -8,10 +8,12 @@
           <th class="px-4 py-3 text-left font-medium text-gray-500 hidden sm:table-cell">From</th>
           <th class="px-4 py-3 text-left font-medium text-gray-500">Until</th>
           <th class="px-4 py-3 text-left font-medium text-gray-500">Status</th>
+          <th class="px-4 py-3"></th>
         </tr>
       </thead>
       <tbody class="divide-y divide-gray-100">
         <% @access_grants.each do |grant| %>
+          <% past = grant.revoked_at.present? || grant.ends_at <= Time.current %>
           <tr class="hover:bg-gray-50 transition-colors">
             <td class="px-4 py-3 font-medium text-gray-900">
               <%= link_to "Unit #{grant.lock.unit_identifier}", core_lock_path(grant.lock), class: "hover:underline", data: { turbo_frame: "_top" } %>
@@ -26,6 +28,13 @@
                 <span class="text-xs font-medium text-amber-600">Upcoming</span>
               <% else %>
                 <span class="text-xs font-medium text-green-600">Active</span>
+              <% end %>
+            </td>
+            <td class="px-4 py-3 text-right">
+              <% unless past %>
+                <%= link_to "Edit", edit_core_access_grant_path(grant, return_to: request.original_url),
+                      class: "px-2.5 py-1 text-xs font-medium text-gray-500 border border-gray-200 rounded-lg hover:bg-gray-50 hover:text-gray-900 transition-colors",
+                      data: { turbo_frame: "_top" } %>
               <% end %>
             </td>
           </tr>
