@@ -24,10 +24,10 @@ RSpec.describe "Core::Locks::AccessGrants", type: :request do
 
   describe "POST /locks/:lock_id/access_grants — existing tenant" do
     let(:valid_params) do
-      { access_grant: { tenant_mode: "existing", tenant_id: tenant.id, ends_at: 1.month.from_now.to_date.to_s } }
+      { access_grant: { tenant_mode: "existing", tenant_id: tenant.id, starts_at: Date.current.to_s, ends_at: 1.month.from_now.to_date.to_s } }
     end
 
-    it "creates a grant and redirects with PIN in flash" do
+    it "creates a grant and redirects with notice" do
       post core_lock_access_grants_path(lock), params: valid_params
       expect(response).to redirect_to(core_lock_path(lock))
       follow_redirect!
@@ -44,12 +44,13 @@ RSpec.describe "Core::Locks::AccessGrants", type: :request do
           last_name:   "Jones",
           email:       "tom@example.com",
           phone:       "07700900001",
+          starts_at:   Date.current.to_s,
           ends_at:     1.month.from_now.to_date.to_s
         }
       }
     end
 
-    it "creates the tenant and grant, redirects with PIN in flash" do
+    it "creates the tenant and grant, redirects with notice" do
       expect { post core_lock_access_grants_path(lock), params: valid_params }
         .to change(Tenant, :count).by(1)
         .and change(AccessGrant, :count).by(1)

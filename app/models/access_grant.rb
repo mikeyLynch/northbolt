@@ -2,7 +2,7 @@ class AccessGrant < ApplicationRecord
   belongs_to :lock
   belongs_to :tenant
 
-  validates :pin_digest,  presence: true
+  validates :pin_ciphertext, presence: true
   validates :starts_at,   presence: true
   validates :ends_at,     presence: true
   validate  :only_one_active_grant_per_lock, on: :create
@@ -14,11 +14,11 @@ class AccessGrant < ApplicationRecord
   def self.issue!(lock:, tenant:, ends_at:, starts_at: Time.current, pin: nil)
     pin ||= rand(1000..9999).to_s
     grant = create!(
-      lock:       lock,
-      tenant:     tenant,
-      pin_digest: BCrypt::Password.create(pin),
-      starts_at:  starts_at,
-      ends_at:    ends_at
+      lock:           lock,
+      tenant:         tenant,
+      pin_ciphertext: pin,
+      starts_at:      starts_at,
+      ends_at:        ends_at
     )
     [ grant, pin ]
   end

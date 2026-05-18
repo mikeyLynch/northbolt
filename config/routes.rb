@@ -1,4 +1,8 @@
 Rails.application.routes.draw do
+  authenticate :user do
+    mount Rswag::Ui::Engine  => "/api-docs"
+    mount Rswag::Api::Engine => "/api-docs"
+  end
   get "up" => "rails/health#show", as: :rails_health_check
 
   devise_for :users, path: "", path_names: { sign_in: "sign_in", sign_out: "sign_out", password: "password" }, skip: [ :registrations ]
@@ -12,7 +16,7 @@ Rails.application.routes.draw do
     get  "activity",               to: "activity#index",        as: :activity
     get  "billing",                to: "billing#index",         as: :billing
     get  "settings",               to: "settings#index",        as: :settings
-    get  "developers",             to: "developers#index",      as: :developers
+
     get  "notifications",          to: "notifications#index",   as: :notifications
     get  "notifications/unread_count", to: "notifications#unread_count", as: :notifications_unread_count
     patch "notifications/read_all", to: "notifications#read_all", as: :notifications_read_all
@@ -30,5 +34,17 @@ Rails.application.routes.draw do
   end
 
   namespace :api do
+    namespace :public do
+      namespace :v1 do
+        resources :locks,   only: %i[ index show ]
+        resources :tenants, only: %i[ index create ]
+      end
+    end
+
+    namespace :private do
+      namespace :v1 do
+        resource :heartbeat, only: %i[ create ]
+      end
+    end
   end
 end

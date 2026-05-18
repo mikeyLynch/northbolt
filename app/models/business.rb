@@ -6,4 +6,8 @@ class Business < ApplicationRecord
   has_many :notifications, dependent: :destroy
 
   validates :name, presence: true
+
+  def self.find_by_api_key(token)
+    all.find { |b| b.api_key_digest.present? && BCrypt::Password.new(b.api_key_digest) == token }
+  end
 end

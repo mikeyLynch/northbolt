@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_18_124916) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_18_125903) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -18,7 +18,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_18_124916) do
     t.datetime "created_at", null: false
     t.datetime "ends_at", null: false
     t.bigint "lock_id", null: false
-    t.string "pin_digest", null: false
+    t.string "pin_ciphertext", null: false
     t.datetime "revoked_at"
     t.datetime "starts_at", null: false
     t.bigint "tenant_id", null: false
@@ -29,6 +29,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_18_124916) do
   end
 
   create_table "businesses", force: :cascade do |t|
+    t.string "api_key_digest"
     t.datetime "created_at", null: false
     t.string "name", null: false
     t.datetime "updated_at", null: false
@@ -48,10 +49,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_18_124916) do
   end
 
   create_table "locks", force: :cascade do |t|
+    t.integer "battery_level"
     t.datetime "created_at", null: false
     t.string "device_uuid", null: false
     t.datetime "last_seen_at"
     t.bigint "location_id", null: false
+    t.text "public_key"
     t.string "unit_identifier", null: false
     t.datetime "updated_at", null: false
     t.index ["device_uuid"], name: "index_locks_on_device_uuid", unique: true

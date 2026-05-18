@@ -19,13 +19,15 @@ class Core::Tenants::LockAssignmentsController < Core::BaseController
       starts_at = attrs[:starts_at].present? ? Date.parse(attrs[:starts_at]) : Date.current
       ends_at   = Date.parse(attrs[:ends_at])
 
-      _, pin = AccessGrant.issue!(lock: lock, tenant: @tenant, starts_at: starts_at, ends_at: ends_at, pin: shared_pin)
-      issued << { "unit_identifier" => lock.unit_identifier, "location_name" => lock.location.name, "pin" => pin }
+      AccessGrant.issue!(lock: lock, tenant: @tenant, starts_at: starts_at, ends_at: ends_at, pin: shared_pin)
+      issued << { "unit_identifier" => lock.unit_identifier, "location_name" => lock.location.name }
     rescue ArgumentError, Date::Error, ActiveRecord::RecordInvalid
       next
     end
 
-    redirect_to core_tenant_path(@tenant), flash: { granted_grants: issued }
+    count = issued.size
+    redirect_to core_tenant_path(@tenant),
+      notice: "Access granted — #{count == 1 ? "PIN" : "#{count} PINs"} sent to tenant."
   end
 
   private

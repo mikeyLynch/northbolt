@@ -19,12 +19,8 @@
     <% end %>
   </div>
 
-  <% if flash[:granted_pin] %>
-    <div class="px-4 py-4 rounded-xl bg-green-50 border border-green-200 space-y-1">
-      <p class="text-sm font-semibold text-green-800">Access granted — PIN issued</p>
-      <p class="text-3xl font-mono font-bold tracking-widest text-green-900"><%= flash[:granted_pin] %></p>
-      <p class="text-xs text-green-700">This PIN has been sent to the tenant. It will not be shown again.</p>
-    </div>
+  <% if flash[:notice] %>
+    <div class="px-4 py-3 rounded-lg bg-green-50 border border-green-200 text-sm text-green-800"><%= flash[:notice] %></div>
   <% end %>
 
   <% if flash[:alert] %>

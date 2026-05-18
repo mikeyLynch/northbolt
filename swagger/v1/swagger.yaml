@@ -1,0 +1,221 @@
+---
+openapi: 3.0.1
+info:
+  title: Northbolt Public API
+  version: v1
+  description: API for integrating with the Northbolt smart lock platform. Authenticate
+    all requests with your API key in the Authorization header.
+servers:
+- url: https://{host}
+  variables:
+    host:
+      default: app.northbolt.io
+components:
+  securitySchemes:
+    bearer_auth:
+      type: http
+      scheme: bearer
+      description: API key issued from Settings → API keys
+  schemas:
+    Lock:
+      type: object
+      properties:
+        id:
+          type: integer
+        unit_identifier:
+          type: string
+          example: A12
+        device_uuid:
+          type: string
+          format: uuid
+        location:
+          type: string
+          example: High Street facility
+        last_seen_at:
+          type: string
+          format: date-time
+          nullable: true
+        status:
+          type: string
+          enum:
+          - available
+          - unavailable
+          - available_soon
+          - unavailable_soon
+      required:
+      - id
+      - unit_identifier
+      - device_uuid
+      - location
+      - status
+    Tenant:
+      type: object
+      properties:
+        id:
+          type: integer
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+          format: email
+          nullable: true
+        phone:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+      required:
+      - id
+      - first_name
+      - last_name
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+security:
+- bearer_auth: []
+paths:
+  "/api/public/v1/locks":
+    get:
+      summary: List all locks
+      tags:
+      - Locks
+      security:
+      - bearer_auth: []
+      parameters:
+      - name: available
+        in: query
+        schema:
+          type: boolean
+        required: false
+        description: When true, returns only locks with no active or upcoming tenant
+      responses:
+        '200':
+          description: locks returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/Lock"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+  "/api/public/v1/locks/{id}":
+    get:
+      summary: Get a lock
+      tags:
+      - Locks
+      security:
+      - bearer_auth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: lock returned
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Lock"
+        '404':
+          description: lock not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+  "/api/public/v1/tenants":
+    get:
+      summary: List all tenants
+      tags:
+      - Tenants
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: tenants returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/Tenant"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+    post:
+      summary: Create a tenant
+      tags:
+      - Tenants
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '201':
+          description: tenant created
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Tenant"
+        '422':
+          description: invalid parameters
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: string
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tenant:
+                  type: object
+                  properties:
+                    first_name:
+                      type: string
+                      example: Jane
+                    last_name:
+                      type: string
+                      example: Smith
+                    email:
+                      type: string
+                      format: email
+                      example: jane@example.com
+                    phone:
+                      type: string
+                      example: '07700900000'
+                  required:
+                  - first_name
+                  - last_name
+        required: true

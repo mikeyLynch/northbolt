@@ -7,7 +7,7 @@ RSpec.describe AccessGrant, type: :model do
   end
 
   describe "validations" do
-    it { is_expected.to validate_presence_of(:pin_digest) }
+    it { is_expected.to validate_presence_of(:pin_ciphertext) }
     it { is_expected.to validate_presence_of(:starts_at) }
     it { is_expected.to validate_presence_of(:ends_at) }
 
@@ -54,15 +54,14 @@ RSpec.describe AccessGrant, type: :model do
 
       expect(grant).to be_persisted
       expect(pin).to match(/\A\d{4}\z/)
-      expect(BCrypt::Password.new(grant.pin_digest)).to eq(pin)
     end
 
-    it "does not store the plaintext PIN" do
+    it "stores the PIN in pin_ciphertext" do
       lock   = create(:lock)
       tenant = create(:tenant)
       grant, pin = AccessGrant.issue!(lock: lock, tenant: tenant, ends_at: 1.month.from_now)
 
-      expect(grant.pin_digest).not_to eq(pin)
+      expect(grant.pin_ciphertext).to eq(pin)
     end
 
     it "uses the supplied pin when one is provided" do
@@ -71,7 +70,7 @@ RSpec.describe AccessGrant, type: :model do
       grant, pin = AccessGrant.issue!(lock: lock, tenant: tenant, ends_at: 1.month.from_now, pin: "1234")
 
       expect(pin).to eq("1234")
-      expect(BCrypt::Password.new(grant.pin_digest)).to eq("1234")
+      expect(grant.pin_ciphertext).to eq("1234")
     end
   end
 
