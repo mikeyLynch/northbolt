@@ -1,0 +1,138 @@
+---
+openapi: 3.0.1
+info:
+  title: Northbolt Private API
+  version: v1
+  description: Internal API used by Northbolt lock hardware. Not for public use.
+servers:
+- url: https://{host}
+  variables:
+    host:
+      default: app.northbolt.io
+components:
+  securitySchemes:
+    lock_auth:
+      type: apiKey
+      in: header
+      name: X-Signature
+      description: Base64-encoded Ed25519 signature over (raw request body + X-Timestamp).
+        Must be paired with X-Device-UUID and X-Timestamp headers.
+  schemas:
+    AccessEvent:
+      type: object
+      properties:
+        event_type:
+          type: string
+          enum:
+          - pin_accepted
+          - pin_rejected
+          - bolt_locked
+          - bolt_opened
+          example: pin_accepted
+        occurred_at:
+          type: string
+          format: date-time
+          example: '2026-05-18T14:32:11Z'
+      required:
+      - event_type
+      - occurred_at
+    Grant:
+      type: object
+      properties:
+        id:
+          type: integer
+        pin_ciphertext:
+          type: string
+          description: PIN encrypted with the lock's public key
+        starts_at:
+          type: string
+          format: date-time
+        ends_at:
+          type: string
+          format: date-time
+      required:
+      - id
+      - pin_ciphertext
+      - starts_at
+      - ends_at
+    HeartbeatResponse:
+      type: object
+      properties:
+        received_at:
+          type: string
+          format: date-time
+        grant:
+          nullable: true
+          allOf:
+          - "$ref": "#/components/schemas/Grant"
+          description: The currently active grant, or null if the unit is unoccupied.
+      required:
+      - received_at
+      - grant
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+security: []
+paths:
+  "/api/private/v1/heartbeat":
+    post:
+      summary: Send heartbeat
+      tags:
+      - Heartbeat
+      description: Called by the lock periodically to report status and sync active
+        grants. Each request must be signed with the lock's Ed25519 private key.
+      parameters:
+      - name: X-Device-UUID
+        in: header
+        required: true
+        description: The lock's unique device identifier (UUID)
+        schema:
+          type: string
+      - name: X-Timestamp
+        in: header
+        required: true
+        description: ISO8601 timestamp of the request. Must be within 5 minutes of
+          server time to prevent replay attacks.
+        schema:
+          type: string
+      - name: X-Signature
+        in: header
+        required: true
+        description: Base64-encoded Ed25519 signature over (raw request body + X-Timestamp)
+        schema:
+          type: string
+      responses:
+        '200':
+          description: heartbeat received
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/HeartbeatResponse"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                battery_level:
+                  type: integer
+                  minimum: 0
+                  maximum: 100
+                  example: 87
+                  description: Battery percentage. Triggers a low battery notification
+                    to the operator at ≤20%.
+                events:
+                  type: array
+                  maxItems: 5
+                  description: Access events queued since the last heartbeat. The
+                    lock buffers up to 5 and clears them on receipt of a 200.
+                  items:
+                    "$ref": "#/components/schemas/AccessEvent"

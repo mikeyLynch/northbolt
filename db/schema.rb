@@ -10,9 +10,18 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_18_125903) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_18_140303) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "access_events", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "event_type", null: false
+    t.bigint "lock_id", null: false
+    t.datetime "occurred_at", null: false
+    t.index ["lock_id", "occurred_at"], name: "index_access_events_on_lock_id_and_occurred_at"
+    t.index ["lock_id"], name: "index_access_events_on_lock_id"
+  end
 
   create_table "access_grants", force: :cascade do |t|
     t.datetime "created_at", null: false
@@ -240,6 +249,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_18_125903) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "access_events", "locks"
   add_foreign_key "access_grants", "locks"
   add_foreign_key "access_grants", "tenants"
   add_foreign_key "locations", "businesses"

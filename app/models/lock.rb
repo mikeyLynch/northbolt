@@ -1,6 +1,7 @@
 class Lock < ApplicationRecord
   belongs_to :location
   has_many :access_grants, dependent: :destroy
+  has_many :access_events, dependent: :destroy
   has_many :tenants, through: :access_grants
   has_one :current_grant, -> { active }, class_name: "AccessGrant"
   has_one :current_tenant, through: :current_grant, source: :tenant

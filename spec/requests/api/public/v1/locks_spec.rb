@@ -1,6 +1,6 @@
 require "swagger_helper"
 
-RSpec.describe "Api::Public::V1::Locks", type: :request do
+RSpec.describe "Api::Public::V1::Locks", type: :request, openapi_spec: "public/v1/swagger.yaml" do
   let(:business)  { create(:business, api_key_digest: Digest::SHA256.hexdigest("testkey")) }
   let(:location)  { create(:location, business: business) }
   let(:lock)      { create(:lock, location: location) }

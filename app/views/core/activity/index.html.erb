@@ -4,8 +4,31 @@
 
   <h1 class="text-lg font-semibold text-gray-900">Activity</h1>
 
-  <div class="bg-white border border-gray-200 rounded-xl px-4 py-12 text-center text-sm text-gray-400">
-    Activity coming soon.
-  </div>
+  <% if @events.none? %>
+    <div class="bg-white border border-gray-200 rounded-xl px-4 py-12 text-center text-sm text-gray-400">
+      No activity yet. Events will appear here once your locks start reporting in.
+    </div>
+  <% else %>
+    <div class="bg-white border border-gray-200 rounded-xl divide-y divide-gray-100">
+      <% @events.each do |event| %>
+        <div class="flex items-start gap-4 px-4 py-3.5">
+          <div class="mt-0.5 shrink-0 w-7 h-7 rounded-full flex items-center justify-center <%= event_icon_bg(event.event_type) %>">
+            <%= render "core/activity/event_icon", event_type: event.event_type %>
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="text-sm text-gray-900"><%= event_label(event.event_type) %> — Unit <%= event.lock.unit_identifier %></p>
+            <p class="text-xs text-gray-400 mt-0.5"><%= event.lock.location.name %></p>
+          </div>
+          <time class="text-xs text-gray-400 shrink-0 mt-0.5" datetime="<%= event.occurred_at.iso8601 %>">
+            <%= event.occurred_at.strftime("%-d %b %Y, %H:%M") %>
+          </time>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="flex justify-center">
+      <%= paginate @events %>
+    </div>
+  <% end %>
 
 </div>

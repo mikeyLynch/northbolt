@@ -4,7 +4,7 @@ RSpec.configure do |config|
   config.openapi_root = Rails.root.join("swagger").to_s
 
   config.openapi_specs = {
-    "v1/swagger.yaml" => {
+    "public/v1/swagger.yaml" => {
       openapi: "3.0.1",
       info: {
         title: "Northbolt Public API",
@@ -56,6 +56,70 @@ RSpec.configure do |config|
         }
       },
       security: [ { bearer_auth: [] } ]
+    },
+    "private/v1/swagger.yaml" => {
+      openapi: "3.0.1",
+      info: {
+        title: "Northbolt Private API",
+        version: "v1",
+        description: "Internal API used by Northbolt lock hardware. Not for public use."
+      },
+      servers: [
+        { url: "https://{host}", variables: { host: { default: "app.northbolt.io" } } }
+      ],
+      components: {
+        securitySchemes: {
+          lock_auth: {
+            type: :apiKey,
+            in: :header,
+            name: "X-Signature",
+            description: "Base64-encoded Ed25519 signature over (raw request body + X-Timestamp). Must be paired with X-Device-UUID and X-Timestamp headers."
+          }
+        },
+        schemas: {
+          AccessEvent: {
+            type: :object,
+            properties: {
+              event_type:  {
+                type: :string,
+                enum: AccessEvent::TYPES,
+                example: "pin_accepted"
+              },
+              occurred_at: { type: :string, format: "date-time", example: "2026-05-18T14:32:11Z" }
+            },
+            required: %w[event_type occurred_at]
+          },
+          Grant: {
+            type: :object,
+            properties: {
+              id:             { type: :integer },
+              pin_ciphertext: { type: :string, description: "PIN encrypted with the lock's public key" },
+              starts_at:      { type: :string, format: "date-time" },
+              ends_at:        { type: :string, format: "date-time" }
+            },
+            required: %w[id pin_ciphertext starts_at ends_at]
+          },
+          HeartbeatResponse: {
+            type: :object,
+            properties: {
+              received_at: { type: :string, format: "date-time" },
+              grant: {
+                nullable: true,
+                allOf: [ { "$ref" => "#/components/schemas/Grant" } ],
+                description: "The currently active grant, or null if the unit is unoccupied."
+              }
+            },
+            required: %w[received_at grant]
+          },
+          Error: {
+            type: :object,
+            properties: {
+              error: { type: :string }
+            }
+          }
+        }
+      },
+      security: []
     }
   }
 

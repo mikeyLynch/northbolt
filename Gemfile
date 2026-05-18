@@ -43,6 +43,7 @@ gem "thruster", require: false
 
 gem "devise"
 gem "kaminari"
+gem "rbnacl"
 gem "rswag-api"
 gem "rswag-ui"
 
