@@ -125,7 +125,7 @@ historical_assignments.each do |a|
   pin = rand(1000..9999).to_s
   lock.access_grants.create!(
     tenant:     a[:tenant],
-    pin_digest: BCrypt::Password.create(pin),
+    pin_ciphertext: pin,
     starts_at:  a[:starts_at],
     ends_at:    a[:ends_at],
     revoked_at: a[:ends_at]

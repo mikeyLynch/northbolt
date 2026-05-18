@@ -1,28 +1,32 @@
 class Api::Public::V1::LocksController < Api::Public::V1::BaseController
   def index
-    locks = @current_business.locks
-    locks = locks.select { |l| l.tenancy_status == "available" } if params[:available] == "true"
+    locks = @current_business.locks.includes(:location).to_a
+    statuses = Lock.compute_tenancy_statuses(locks)
 
-    render json: locks.map { |l| lock_json(l) }
+    if params[:available] == "true"
+      locks = locks.select { |l| statuses[l.id] == "available" }
+    end
+
+    render json: locks.map { |l| lock_json(l, statuses[l.id]) }
   end
 
   def show
-    lock = @current_business.locks.find(params[:id])
-    render json: lock_json(lock)
+    lock = @current_business.locks.includes(:location).find(params[:id])
+    render json: lock_json(lock, lock.tenancy_status)
   rescue ActiveRecord::RecordNotFound
     render json: { error: "Not found" }, status: :not_found
   end
 
   private
 
-  def lock_json(lock)
+  def lock_json(lock, status)
     {
       id: lock.id,
       unit_identifier: lock.unit_identifier,
       device_uuid: lock.device_uuid,
       location: lock.location.name,
       last_seen_at: lock.last_seen_at,
-      status: lock.tenancy_status
+      status: status
     }
   end
 end

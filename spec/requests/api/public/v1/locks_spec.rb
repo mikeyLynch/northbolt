@@ -1,10 +1,10 @@
 require "swagger_helper"
 
 RSpec.describe "Api::Public::V1::Locks", type: :request do
-  let(:business)  { create(:business, api_key_digest: BCrypt::Password.create("test-api-key")) }
+  let(:business)  { create(:business, api_key_digest: Digest::SHA256.hexdigest("testkey")) }
   let(:location)  { create(:location, business: business) }
   let(:lock)      { create(:lock, location: location) }
-  let(:Authorization) { "Bearer test-api-key" }
+  let(:Authorization) { "Bearer nb_#{business.id}_testkey" }
 
   before { lock }
 

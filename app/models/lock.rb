@@ -37,4 +37,30 @@ class Lock < ApplicationRecord
   def probably_offline?
     !probably_online?
   end
+
+  def self.compute_tenancy_statuses(locks)
+    now = Time.current
+    lock_ids = locks.map(&:id)
+    statuses = lock_ids.index_with { "available" }
+
+    AccessGrant
+      .where(lock_id: lock_ids, revoked_at: nil)
+      .where("ends_at > ?", now)
+      .where("starts_at <= ?", 1.week.from_now)
+      .select(:lock_id, :starts_at, :ends_at)
+      .each do |grant|
+        current = statuses[grant.lock_id]
+        if grant.starts_at <= now
+          if grant.ends_at <= 3.days.from_now
+            statuses[grant.lock_id] = "available_soon"
+          elsif current != "available_soon"
+            statuses[grant.lock_id] = "unavailable"
+          end
+        elsif current == "available"
+          statuses[grant.lock_id] = "unavailable_soon"
+        end
+      end
+
+    statuses
+  end
 end
