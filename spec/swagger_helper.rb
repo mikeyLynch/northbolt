@@ -80,10 +80,11 @@ RSpec.configure do |config|
           AccessEvent: {
             type: :object,
             properties: {
-              event_type:  {
+              event_type: {
                 type: :string,
                 enum: AccessEvent::TYPES,
-                example: "pin_accepted"
+                example: "pin_accepted",
+                description: "pin_accepted or pin_rejected. The lock reports only PIN outcomes — bolt state and access sequences are inferred server-side."
               },
               occurred_at: { type: :string, format: "date-time", example: "2026-05-18T14:32:11Z" }
             },

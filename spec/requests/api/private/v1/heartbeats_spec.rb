@@ -55,8 +55,8 @@ RSpec.describe "Api::Private::V1::Heartbeats", type: :request, openapi_spec: "pr
           {
             battery_level: 87,
             events: [
-              { event_type: "pin_accepted", occurred_at: 2.minutes.ago.iso8601 },
-              { event_type: "bolt_locked",  occurred_at: 1.minute.ago.iso8601 }
+              { event_type: "pin_rejected", occurred_at: 3.minutes.ago.iso8601 },
+              { event_type: "pin_accepted", occurred_at: 2.minutes.ago.iso8601 }
             ]
           }
         end

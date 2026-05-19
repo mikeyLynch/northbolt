@@ -1,5 +1,5 @@
 class AccessEvent < ApplicationRecord
-  TYPES = %w[pin_accepted pin_rejected bolt_locked bolt_opened].freeze
+  TYPES = %w[pin_accepted pin_rejected].freeze
 
   belongs_to :lock
 
