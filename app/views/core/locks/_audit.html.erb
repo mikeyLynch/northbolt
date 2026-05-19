@@ -1,3 +1,38 @@
-<div class="bg-white border border-gray-200 rounded-xl px-4 py-12 text-center text-sm text-gray-400">
-  Audit trail coming soon.
+<div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
+  <% if @access_events.any? %>
+    <table class="w-full text-sm">
+      <thead>
+        <tr class="border-b border-gray-100 bg-gray-50">
+          <th class="px-4 py-3 text-left font-medium text-gray-500">Event</th>
+          <th class="px-4 py-3 text-left font-medium text-gray-500">When</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100">
+        <% @access_events.each do |event| %>
+          <tr class="hover:bg-gray-50 transition-colors">
+            <td class="px-4 py-3">
+              <div class="flex items-center gap-2.5">
+                <div class="w-6 h-6 rounded-full flex items-center justify-center shrink-0 <%= event_icon_bg(event.event_type) %>">
+                  <%= render "core/activity/event_icon", event_type: event.event_type %>
+                </div>
+                <span class="font-medium text-gray-900"><%= event_label(event.event_type) %></span>
+              </div>
+            </td>
+            <td class="px-4 py-3 text-gray-500">
+              <time datetime="<%= event.occurred_at.iso8601 %>">
+                <%= event.occurred_at.strftime("%-d %b %Y, %H:%M:%S") %>
+              </time>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+    <% if @access_events.total_pages > 1 %>
+      <div class="px-4 py-3 border-t border-gray-100">
+        <%= paginate @access_events %>
+      </div>
+    <% end %>
+  <% else %>
+    <div class="px-4 py-12 text-center text-sm text-gray-400">No access events recorded yet.</div>
+  <% end %>
 </div>

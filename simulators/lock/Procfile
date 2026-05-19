@@ -1,0 +1,4 @@
+lock1: ruby simulators/lock/simulator.rb --id 1
+lock2: ruby simulators/lock/simulator.rb --id 2
+lock3: ruby simulators/lock/simulator.rb --id 3
+lock4: ruby simulators/lock/simulator.rb --id 4

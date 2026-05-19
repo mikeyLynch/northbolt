@@ -40,6 +40,8 @@ class Core::LocksController < Core::BaseController
                             .first
     when "history"
       @access_grants = @lock.access_grants.includes(:tenant).order(created_at: :desc)
+    when "audit"
+      @access_events = @lock.access_events.recent.page(params[:page]).per(50)
     end
   end
 
