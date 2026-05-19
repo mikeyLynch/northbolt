@@ -13,7 +13,8 @@ class Core::Locks::AccessGrantsController < Core::BaseController
 
     return render :new, status: :unprocessable_entity unless tenant.save
 
-    AccessGrant.issue!(lock: @lock, tenant: tenant, starts_at: starts_at, ends_at: ends_at)
+    grant, _pin = AccessGrant.issue!(lock: @lock, tenant: tenant, starts_at: starts_at, ends_at: ends_at)
+    TenantMailer.access_granted(tenant, [ grant ]).deliver_later
     redirect_to core_lock_path(@lock), notice: "Access granted — PIN sent to tenant."
   rescue ActiveRecord::RecordInvalid => e
     @tenants = current_user.business.tenants.order(:last_name, :first_name)

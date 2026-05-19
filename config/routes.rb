@@ -1,4 +1,8 @@
 Rails.application.routes.draw do
+  if Rails.env.development?
+    mount LetterOpenerWeb::Engine, at: "/letter_opener"
+  end
+
   authenticate :user do
     mount Rswag::Ui::Engine  => "/api-docs"
     mount Rswag::Api::Engine => "/api-docs"

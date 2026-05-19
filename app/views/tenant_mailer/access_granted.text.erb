@@ -1,0 +1,46 @@
+Hello <%= @tenant.first_name %>,
+
+<% if @grants.one? %>
+Your access has been set up for the following storage unit.
+
+  Facility:     <%= @business.name %>
+  Location:     <%= @grants.first.lock.location.name %>
+  Unit:         Unit <%= @grants.first.lock.unit_identifier %>
+  Access from:  <%= @grants.first.starts_at.strftime("%-d %B %Y") %>
+  Access until: <%= @grants.first.ends_at.strftime("%-d %B %Y") %>
+
+YOUR PIN
+--------
+<%= @grants.first.pin_ciphertext %>
+
+<% elsif @same_pin %>
+Your access has been set up for <%= @grants.count %> storage units. Your PIN works on all of them.
+
+YOUR PIN
+--------
+<%= @grants.first.pin_ciphertext %>
+
+UNITS
+-----
+<% @grants.each do |grant| %>
+  Unit <%= grant.lock.unit_identifier %> — <%= grant.lock.location.name %>
+  Access: <%= grant.starts_at.strftime("%-d %B %Y") %> to <%= grant.ends_at.strftime("%-d %B %Y") %>
+
+<% end %>
+<% else %>
+Your access has been set up for <%= @grants.count %> storage units, each with its own PIN.
+
+<% @grants.each do |grant| %>
+Unit <%= grant.lock.unit_identifier %> — <%= grant.lock.location.name %>
+Access: <%= grant.starts_at.strftime("%-d %B %Y") %> to <%= grant.ends_at.strftime("%-d %B %Y") %>
+PIN: <%= grant.pin_ciphertext %>
+
+<% end %>
+<% end %>
+HOW TO ACCESS YOUR UNIT
+------------------------
+Enter your PIN on the keypad beside the door. When accepted, slide the bolt to open. To lock up, slide the bolt back to the closed position.
+
+---
+This email was sent by Northbolt on behalf of <%= @business.name %>.
+Please do not reply to this email.

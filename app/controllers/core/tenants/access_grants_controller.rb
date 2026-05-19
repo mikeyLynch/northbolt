@@ -9,7 +9,8 @@ class Core::Tenants::AccessGrantsController < Core::BaseController
     lock = current_user.business.locks.find(params[:access_grant][:lock_id])
     ends_at = Date.parse(params[:access_grant][:ends_at]).end_of_day
 
-    AccessGrant.issue!(lock: lock, tenant: @tenant, ends_at: ends_at)
+    grant, _pin = AccessGrant.issue!(lock: lock, tenant: @tenant, ends_at: ends_at)
+    TenantMailer.access_granted(@tenant, [ grant ]).deliver_later
     redirect_to core_tenant_path(@tenant, tab: "history"), notice: "Access granted — PIN sent to tenant."
   rescue ActiveRecord::RecordInvalid => e
     @available_locks = available_locks
