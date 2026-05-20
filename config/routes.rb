@@ -19,7 +19,8 @@ Rails.application.routes.draw do
     get  "dashboard",              to: "dashboard#index",       as: :dashboard
     get  "activity",               to: "activity#index",        as: :activity
     get  "billing",                to: "billing#index",         as: :billing
-    get  "settings",               to: "settings#index",        as: :settings
+    get   "settings",                to: "settings#index",         as: :settings
+    patch "settings/stora",          to: "settings#update_stora",  as: :settings_stora
 
     get  "notifications",          to: "notifications#index",   as: :notifications
     get  "notifications/unread_count", to: "notifications#unread_count", as: :notifications_unread_count
@@ -35,6 +36,10 @@ Rails.application.routes.draw do
     resources :access_grants, only: %i[ edit update ] do
       member { patch :revoke }
     end
+  end
+
+  namespace :webhooks do
+    post "stora/:token", to: "stora#create", as: :stora
   end
 
   namespace :api do

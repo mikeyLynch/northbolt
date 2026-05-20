@@ -39,6 +39,7 @@ class AccessGrant < ApplicationRecord
 
   def only_one_active_grant_per_lock
     return unless lock_id.present?
+    return if revoked_at.present?
     if lock.access_grants.active.exists?
       errors.add(:lock, "already has an active access grant")
     end
