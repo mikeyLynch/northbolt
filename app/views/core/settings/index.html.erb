@@ -13,14 +13,14 @@
         <%= link_to "API keys", core_settings_path(tab: "api_keys"),
               class: "px-4 py-2 text-sm font-medium border-b-2 transition-colors #{@tab == 'api_keys' ? 'border-gray-900 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-900'}",
               data: { turbo_frame: "settings_tab", turbo_action: "advance" } %>
+        <%= link_to "Integrations", core_settings_path(tab: "integrations"),
+              class: "px-4 py-2 text-sm font-medium border-b-2 transition-colors #{@tab == 'integrations' ? 'border-gray-900 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-900'}",
+              data: { turbo_frame: "settings_tab", turbo_action: "advance" } %>
         <%= link_to "Team", core_settings_path(tab: "team"),
               class: "px-4 py-2 text-sm font-medium border-b-2 transition-colors #{@tab == 'team' ? 'border-gray-900 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-900'}",
               data: { turbo_frame: "settings_tab", turbo_action: "advance" } %>
         <%= link_to "Locations", core_settings_path(tab: "locations"),
               class: "px-4 py-2 text-sm font-medium border-b-2 transition-colors #{@tab == 'locations' ? 'border-gray-900 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-900'}",
-              data: { turbo_frame: "settings_tab", turbo_action: "advance" } %>
-        <%= link_to "Integrations", core_settings_path(tab: "integrations"),
-              class: "px-4 py-2 text-sm font-medium border-b-2 transition-colors #{@tab == 'integrations' ? 'border-gray-900 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-900'}",
               data: { turbo_frame: "settings_tab", turbo_action: "advance" } %>
       </div>
 
