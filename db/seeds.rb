@@ -20,10 +20,10 @@ locations.each do |attrs|
   end
 end
 
-User.find_or_create_by!(email: "michael@email.com") do |u|
+User.find_or_create_by!(email: "michael@northbolt.co.uk") do |u|
   u.first_name = "Michael"
   u.last_name  = "Lynch"
-  u.password   = "michael@email.com"
+  u.password   = "michael@northbolt.co.uk"
   u.business   = business
 end
 
