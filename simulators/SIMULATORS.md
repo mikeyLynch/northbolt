@@ -9,6 +9,7 @@ Each simulator communicates with the Rails server using the real private API, wi
 | Simulator | Description |
 |-----------|-------------|
 | [lock](lock/SIMULATOR.md) | Simulates a Northbolt smart lock — heartbeating, PIN entry, battery reporting |
+| [stora](stora/SIMULATOR.md) | Sends simulated Stora webhook events — bookings, cancellations, payment failures |
 
 ## Requirements
 
