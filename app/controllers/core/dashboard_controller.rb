@@ -1,28 +1,33 @@
 class Core::DashboardController < Core::BaseController
   def index
     business = current_user.business
-    locks    = business.locks
+    locks    = business.locks.includes(:location)
 
-    @total_locks    = locks.count
-    @locks_online   = locks.where("last_seen_at > ?", 15.minutes.ago).count
-
-    @total_units    = @total_locks
-    @units_occupied = locks.joins(:access_grants)
+    @occupied_locks = locks.joins(:access_grants)
                            .where(access_grants: { revoked_at: nil })
                            .where("access_grants.ends_at > ?", Time.current)
+                           .includes(access_grants: :tenant)
                            .distinct
-                           .count
 
-    @low_battery    = locks.where.not(battery_level: nil)
-                           .where("battery_level <= ?", 20)
-                           .count
+    @offline_locks  = locks.where("last_seen_at IS NULL OR last_seen_at <= ?", 15.minutes.ago)
 
-    @failed_pins_today = AccessEvent
-                           .joins(lock: :location)
-                           .where(locations: { business_id: business.id })
-                           .where(event_type: "pin_rejected")
-                           .where("occurred_at > ?", 24.hours.ago)
-                           .count
+    @low_battery_locks = locks.where.not(battery_level: nil)
+                              .where("battery_level <= ?", 20)
+                              .order(:battery_level)
+
+    failed_pin_counts = AccessEvent
+                          .joins(lock: :location)
+                          .where(locations: { business_id: business.id })
+                          .where(event_type: "pin_rejected")
+                          .where("occurred_at > ?", 24.hours.ago)
+                          .group(:lock_id)
+                          .count
+
+    @failed_pin_locks = locks.where(id: failed_pin_counts.keys)
+                             .index_by(&:id)
+                             .transform_values { |lock| { lock: lock, count: failed_pin_counts[lock.id] } }
+                             .values
+                             .sort_by { |h| -h[:count] }
 
     @chart_data = build_chart_data(business)
   end

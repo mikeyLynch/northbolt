@@ -21,27 +21,98 @@
     </div>
   </div>
 
-  <%# Stat cards %>
-  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+  <%# Cards %>
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
-    <div class="bg-white border border-gray-200 rounded-xl px-5 py-4 space-y-1">
-      <p class="text-xs font-medium text-gray-500">Units occupied</p>
-      <p class="text-2xl font-semibold text-gray-900"><%= @units_occupied %><span class="text-base font-normal text-gray-400"> / <%= @total_units %></span></p>
+    <%# Units occupied %>
+    <div class="bg-white border border-gray-200 rounded-xl overflow-hidden flex flex-col h-72">
+      <div class="px-5 py-4 border-b border-gray-100 flex items-baseline justify-between">
+        <h2 class="text-sm font-medium text-gray-900">Units occupied</h2>
+        <span class="text-sm text-gray-400"><%= @occupied_locks.size %></span>
+      </div>
+      <% if @occupied_locks.any? %>
+        <ul class="divide-y divide-gray-100 overflow-y-auto flex-1 min-h-0">
+          <% @occupied_locks.each do |lock| %>
+            <% grant = lock.access_grants.find { |g| g.revoked_at.nil? && g.ends_at > Time.current } %>
+            <li class="px-5 py-3 flex items-center justify-between gap-4">
+              <%= link_to core_lock_path(lock), class: "text-sm font-medium text-gray-900 hover:underline", data: { turbo_frame: "_top" } do %>
+                Unit <%= lock.unit_identifier %>
+              <% end %>
+              <span class="text-xs text-gray-400 shrink-0"><%= grant&.tenant&.full_name %></span>
+            </li>
+          <% end %>
+        </ul>
+      <% else %>
+        <p class="px-5 flex-1 min-h-0 flex items-center justify-center text-sm text-gray-400">No units currently occupied.</p>
+      <% end %>
     </div>
 
-    <div class="bg-white border border-gray-200 rounded-xl px-5 py-4 space-y-1">
-      <p class="text-xs font-medium text-gray-500">Locks online</p>
-      <p class="text-2xl font-semibold text-gray-900"><%= @locks_online %><span class="text-base font-normal text-gray-400"> / <%= @total_locks %></span></p>
+    <%# Locks offline %>
+    <div class="bg-white border border-gray-200 rounded-xl overflow-hidden flex flex-col h-72">
+      <div class="px-5 py-4 border-b border-gray-100 flex items-baseline justify-between">
+        <h2 class="text-sm font-medium text-gray-900">Locks offline</h2>
+        <span class="text-sm <%= @offline_locks.any? ? 'text-amber-500' : 'text-gray-400' %>"><%= @offline_locks.size %></span>
+      </div>
+      <% if @offline_locks.any? %>
+        <ul class="divide-y divide-gray-100 overflow-y-auto flex-1 min-h-0">
+          <% @offline_locks.each do |lock| %>
+            <li class="px-5 py-3 flex items-center justify-between gap-4">
+              <%= link_to core_lock_path(lock), class: "text-sm font-medium text-gray-900 hover:underline", data: { turbo_frame: "_top" } do %>
+                Unit <%= lock.unit_identifier %>
+              <% end %>
+              <span class="text-xs text-gray-400 shrink-0">
+                <%= lock.last_seen_at ? "Last seen #{time_ago_in_words(lock.last_seen_at)} ago" : "Never seen" %>
+              </span>
+            </li>
+          <% end %>
+        </ul>
+      <% else %>
+        <p class="px-5 flex-1 min-h-0 flex items-center justify-center text-sm text-gray-400">All locks are online.</p>
+      <% end %>
     </div>
 
-    <div class="bg-white border border-gray-200 rounded-xl px-5 py-4 space-y-1">
-      <p class="text-xs font-medium text-gray-500">Low battery</p>
-      <p class="text-2xl font-semibold <%= @low_battery > 0 ? 'text-amber-500' : 'text-gray-900' %>"><%= @low_battery %></p>
+    <%# Low battery %>
+    <div class="bg-white border border-gray-200 rounded-xl overflow-hidden flex flex-col h-72">
+      <div class="px-5 py-4 border-b border-gray-100 flex items-baseline justify-between">
+        <h2 class="text-sm font-medium text-gray-900">Low battery</h2>
+        <span class="text-sm <%= @low_battery_locks.any? ? 'text-amber-500' : 'text-gray-400' %>"><%= @low_battery_locks.size %></span>
+      </div>
+      <% if @low_battery_locks.any? %>
+        <ul class="divide-y divide-gray-100 overflow-y-auto flex-1 min-h-0">
+          <% @low_battery_locks.each do |lock| %>
+            <li class="px-5 py-3 flex items-center justify-between gap-4">
+              <%= link_to core_lock_path(lock), class: "text-sm font-medium text-gray-900 hover:underline", data: { turbo_frame: "_top" } do %>
+                Unit <%= lock.unit_identifier %>
+              <% end %>
+              <span class="text-xs text-amber-500 shrink-0"><%= lock.battery_level %>%</span>
+            </li>
+          <% end %>
+        </ul>
+      <% else %>
+        <p class="px-5 flex-1 min-h-0 flex items-center justify-center text-sm text-gray-400">All batteries are healthy.</p>
+      <% end %>
     </div>
 
-    <div class="bg-white border border-gray-200 rounded-xl px-5 py-4 space-y-1">
-      <p class="text-xs font-medium text-gray-500">Failed PINs (24h)</p>
-      <p class="text-2xl font-semibold <%= @failed_pins_today > 0 ? 'text-red-500' : 'text-gray-900' %>"><%= @failed_pins_today %></p>
+    <%# Failed PINs %>
+    <div class="bg-white border border-gray-200 rounded-xl overflow-hidden flex flex-col h-72">
+      <div class="px-5 py-4 border-b border-gray-100 flex items-baseline justify-between">
+        <h2 class="text-sm font-medium text-gray-900">Failed PINs (24h)</h2>
+        <span class="text-sm <%= @failed_pin_locks.any? ? 'text-red-500' : 'text-gray-400' %>"><%= @failed_pin_locks.size %></span>
+      </div>
+      <% if @failed_pin_locks.any? %>
+        <ul class="divide-y divide-gray-100 overflow-y-auto flex-1 min-h-0">
+          <% @failed_pin_locks.each do |entry| %>
+            <li class="px-5 py-3 flex items-center justify-between gap-4">
+              <%= link_to core_lock_path(entry[:lock]), class: "text-sm font-medium text-gray-900 hover:underline", data: { turbo_frame: "_top" } do %>
+                Unit <%= entry[:lock].unit_identifier %>
+              <% end %>
+              <span class="text-xs text-red-400 shrink-0"><%= entry[:count] %> <%= "attempt".pluralize(entry[:count]) %></span>
+            </li>
+          <% end %>
+        </ul>
+      <% else %>
+        <p class="px-5 flex-1 min-h-0 flex items-center justify-center text-sm text-gray-400">No failed PIN attempts.</p>
+      <% end %>
     </div>
 
   </div>
