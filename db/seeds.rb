@@ -25,6 +25,7 @@ User.find_or_create_by!(email: "michael@northbolt.co.uk") do |u|
   u.last_name  = "Lynch"
   u.password   = "michael@northbolt.co.uk"
   u.business   = business
+  u.role       = "owner"
 end
 
 # Tenants for Lynch Storage

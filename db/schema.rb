@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_28_160114) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_28_162730) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -55,6 +55,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_28_160114) do
     t.string "stora_webhook_token"
     t.datetime "updated_at", null: false
     t.index ["stora_webhook_token"], name: "index_businesses_on_stora_webhook_token", unique: true
+  end
+
+  create_table "invitations", force: :cascade do |t|
+    t.datetime "accepted_at"
+    t.bigint "business_id", null: false
+    t.datetime "created_at", null: false
+    t.string "email", null: false
+    t.bigint "invited_by_id", null: false
+    t.string "token", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_id", "email"], name: "index_invitations_on_business_id_and_email", unique: true
+    t.index ["business_id"], name: "index_invitations_on_business_id"
+    t.index ["invited_by_id"], name: "index_invitations_on_invited_by_id"
+    t.index ["token"], name: "index_invitations_on_token", unique: true
   end
 
   create_table "locations", force: :cascade do |t|
@@ -257,6 +271,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_28_160114) do
     t.datetime "remember_created_at"
     t.datetime "reset_password_sent_at"
     t.string "reset_password_token"
+    t.string "role", default: "owner", null: false
     t.integer "sign_in_count", default: 0, null: false
     t.datetime "updated_at", null: false
     t.index ["business_id"], name: "index_users_on_business_id"
@@ -268,6 +283,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_28_160114) do
   add_foreign_key "access_grants", "locks"
   add_foreign_key "access_grants", "tenants"
   add_foreign_key "api_keys", "businesses"
+  add_foreign_key "invitations", "businesses"
+  add_foreign_key "invitations", "users", column: "invited_by_id"
   add_foreign_key "locations", "businesses"
   add_foreign_key "locks", "locations"
   add_foreign_key "notifications", "businesses"

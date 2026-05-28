@@ -4,7 +4,8 @@ class Business < ApplicationRecord
   has_many :tenants,    dependent: :destroy
   has_many :users,      dependent: :destroy
   has_many :notifications, dependent: :destroy
-  has_many :api_keys,   dependent: :destroy
+  has_many :api_keys,      dependent: :destroy
+  has_many :invitations,   dependent: :destroy
 
   validates :name, presence: true
 

@@ -21,8 +21,12 @@ Rails.application.routes.draw do
     get  "billing",                to: "billing#index",         as: :billing
     get    "settings",                to: "settings#index",         as: :settings
     patch  "settings/stora",         to: "settings#update_stora",  as: :settings_stora
-    post   "settings/api_keys",      to: "settings#create_api_key", as: :settings_api_keys
-    delete "settings/api_keys/:id",  to: "settings#revoke_api_key", as: :settings_api_key
+    post   "settings/api_keys",              to: "settings#create_api_key",   as: :settings_api_keys
+    delete "settings/api_keys/:id",          to: "settings#revoke_api_key",   as: :settings_api_key
+    post   "settings/invitations",           to: "settings#create_invitation", as: :settings_invitations
+    post   "settings/invitations/:id/resend", to: "settings#resend_invitation", as: :resend_settings_invitation
+    delete "settings/invitations/:id",       to: "settings#cancel_invitation", as: :settings_invitation
+    delete "settings/members/:id",           to: "settings#remove_member",    as: :settings_member
 
     get  "notifications",          to: "notifications#index",   as: :notifications
     get  "notifications/unread_count", to: "notifications#unread_count", as: :notifications_unread_count
@@ -39,6 +43,9 @@ Rails.application.routes.draw do
       member { patch :revoke }
     end
   end
+
+  get  "invitations/:token", to: "invitations#show",   as: :invitation
+  post "invitations/:token", to: "invitations#accept", as: :accept_invitation
 
   namespace :webhooks do
     post "stora/:token", to: "stora#create", as: :stora

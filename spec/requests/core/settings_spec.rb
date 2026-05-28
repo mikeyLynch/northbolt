@@ -50,6 +50,121 @@ RSpec.describe "Core::Settings", type: :request do
     end
   end
 
+  describe "GET /settings (team tab)" do
+    it "renders the team tab" do
+      get core_settings_path(tab: "team")
+      expect(response).to have_http_status(:ok)
+    end
+  end
+
+  describe "POST /settings/invitations" do
+    it "creates a pending invitation" do
+      expect {
+        post core_settings_invitations_path, params: { email: "new@example.com" }
+      }.to change(Invitation, :count).by(1)
+    end
+
+    it "associates the invitation with the current business" do
+      post core_settings_invitations_path, params: { email: "new@example.com" }
+      expect(business.invitations.last.email).to eq("new@example.com")
+    end
+
+    it "sets invited_by to the current user" do
+      post core_settings_invitations_path, params: { email: "new@example.com" }
+      expect(business.invitations.last.invited_by).to eq(user)
+    end
+
+    it "redirects to the team tab" do
+      post core_settings_invitations_path, params: { email: "new@example.com" }
+      expect(response).to redirect_to(core_settings_path(tab: "team"))
+    end
+
+    it "rejects an email that already has an account" do
+      existing = create(:user, business: business)
+      post core_settings_invitations_path, params: { email: existing.email }
+      expect(response).to redirect_to(core_settings_path(tab: "team"))
+      expect(flash[:alert]).to be_present
+    end
+
+    it "rejects a duplicate pending invitation" do
+      create(:invitation, business: business, invited_by: user, email: "dup@example.com")
+      expect {
+        post core_settings_invitations_path, params: { email: "dup@example.com" }
+      }.not_to change(Invitation, :count)
+    end
+  end
+
+  describe "POST /settings/invitations/:id/resend" do
+    let!(:invitation) { create(:invitation, business: business, invited_by: user) }
+
+    it "regenerates the token" do
+      original_token = invitation.token
+      post core_resend_settings_invitation_path(invitation)
+      expect(invitation.reload.token).not_to eq(original_token)
+    end
+
+    it "redirects to the team tab" do
+      post core_resend_settings_invitation_path(invitation)
+      expect(response).to redirect_to(core_settings_path(tab: "team"))
+    end
+
+    it "cannot resend an invitation belonging to another business" do
+      other = create(:invitation)
+      post core_resend_settings_invitation_path(other)
+      expect(other.reload.token).to eq(other.token)
+    end
+  end
+
+  describe "DELETE /settings/invitations/:id" do
+    let!(:invitation) { create(:invitation, business: business, invited_by: user) }
+
+    it "destroys the invitation" do
+      expect {
+        delete core_settings_invitation_path(invitation)
+      }.to change(Invitation, :count).by(-1)
+    end
+
+    it "redirects to the team tab" do
+      delete core_settings_invitation_path(invitation)
+      expect(response).to redirect_to(core_settings_path(tab: "team"))
+    end
+
+    it "cannot cancel an invitation belonging to another business" do
+      other = create(:invitation)
+      expect {
+        delete core_settings_invitation_path(other)
+      }.not_to change(Invitation, :count)
+    end
+  end
+
+  describe "DELETE /settings/members/:id" do
+    let!(:member) { create(:user, business: business, role: "member") }
+
+    it "removes the member" do
+      expect {
+        delete core_settings_member_path(member)
+      }.to change { business.users.count }.by(-1)
+    end
+
+    it "redirects to the team tab" do
+      delete core_settings_member_path(member)
+      expect(response).to redirect_to(core_settings_path(tab: "team"))
+    end
+
+    it "cannot remove yourself" do
+      delete core_settings_member_path(user)
+      expect(flash[:alert]).to be_present
+      expect(User.exists?(user.id)).to be true
+    end
+
+    it "cannot remove a member of another business" do
+      other = create(:user)
+      expect {
+        delete core_settings_member_path(other)
+      }.not_to change(User, :count)
+    end
+  end
+
   describe "DELETE /settings/api_keys/:id" do
     let!(:api_key) { create(:api_key, business: business) }
 

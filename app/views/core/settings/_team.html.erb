@@ -1,0 +1,80 @@
+<div class="space-y-4">
+
+  <%# Invite form %>
+  <div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
+    <div class="px-6 py-4 border-b border-gray-100">
+      <h2 class="text-sm font-semibold text-gray-900">Invite a team member</h2>
+      <p class="text-xs text-gray-500 mt-0.5">They'll receive an email with a link to set up their account.</p>
+    </div>
+    <div class="px-6 py-6">
+      <%= form_with url: core_settings_invitations_path, method: :post, class: "flex gap-3" do |f| %>
+        <input
+          type="email"
+          name="email"
+          placeholder="colleague@example.com"
+          required
+          class="flex-1 text-sm border border-gray-200 rounded-lg px-3 py-3 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+        >
+        <%= f.submit "Send invite",
+              class: "px-4 py-3 text-sm font-medium text-white bg-gray-900 rounded-lg hover:bg-gray-700 transition-colors cursor-pointer shrink-0" %>
+      <% end %>
+    </div>
+  </div>
+
+  <%# Current members %>
+  <div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
+    <div class="px-6 py-4 border-b border-gray-100">
+      <h2 class="text-sm font-semibold text-gray-900">Members</h2>
+    </div>
+    <ul class="divide-y divide-gray-100">
+      <% @members.each do |member| %>
+        <li class="px-6 py-4 flex items-center justify-between gap-4">
+          <div class="space-y-0.5 min-w-0">
+            <div class="flex items-center gap-2">
+              <p class="text-sm font-medium text-gray-900"><%= member.first_name %> <%= member.last_name %></p>
+              <span class="text-xs font-medium px-1.5 py-0.5 rounded-md <%= member.owner? ? 'bg-gray-100 text-gray-600' : 'bg-blue-50 text-blue-600' %>">
+                <%= member.owner? ? "Owner" : "Member" %>
+              </span>
+            </div>
+            <p class="text-xs text-gray-400"><%= member.email %></p>
+          </div>
+          <% if member != current_user %>
+            <%= button_to "Remove", core_settings_member_path(member),
+                  method: :delete,
+                  class: "text-xs font-medium text-red-600 hover:text-red-700 transition-colors cursor-pointer shrink-0",
+                  form: { data: { turbo_confirm: %(Remove #{member.first_name} #{member.last_name}? They'll lose access immediately.) } } %>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+
+  <%# Pending invitations %>
+  <% if @invitations.any? %>
+    <div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-100">
+        <h2 class="text-sm font-semibold text-gray-900">Pending invitations</h2>
+      </div>
+      <ul class="divide-y divide-gray-100">
+        <% @invitations.each do |invitation| %>
+          <li class="px-6 py-4 flex items-center justify-between gap-4">
+            <div class="space-y-0.5 min-w-0">
+              <p class="text-sm font-medium text-gray-900"><%= invitation.email %></p>
+              <p class="text-xs text-gray-400">Invited by <%= invitation.invited_by.first_name %> · <%= time_ago_in_words(invitation.created_at) %> ago</p>
+            </div>
+            <div class="flex items-center gap-3 shrink-0">
+              <%= button_to "Resend", core_resend_settings_invitation_path(invitation),
+                    method: :post,
+                    class: "text-xs font-medium text-gray-500 hover:text-gray-900 transition-colors cursor-pointer" %>
+              <%= button_to "Cancel", core_settings_invitation_path(invitation),
+                    method: :delete,
+                    class: "text-xs font-medium text-red-600 hover:text-red-700 transition-colors cursor-pointer",
+                    form: { data: { turbo_confirm: "Cancel invitation to #{invitation.email}?" } } %>
+            </div>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+</div>
