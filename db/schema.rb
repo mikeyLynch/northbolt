@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_20_133731) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_28_160114) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -37,8 +37,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_20_133731) do
     t.index ["tenant_id"], name: "index_access_grants_on_tenant_id"
   end
 
+  create_table "api_keys", force: :cascade do |t|
+    t.bigint "business_id", null: false
+    t.datetime "created_at", null: false
+    t.string "digest", null: false
+    t.datetime "last_used_at"
+    t.string "name", null: false
+    t.datetime "revoked_at"
+    t.datetime "updated_at", null: false
+    t.index ["business_id"], name: "index_api_keys_on_business_id"
+  end
+
   create_table "businesses", force: :cascade do |t|
-    t.string "api_key_digest"
     t.datetime "created_at", null: false
     t.string "name", null: false
     t.string "stora_webhook_secret"
@@ -257,6 +267,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_20_133731) do
   add_foreign_key "access_events", "locks"
   add_foreign_key "access_grants", "locks"
   add_foreign_key "access_grants", "tenants"
+  add_foreign_key "api_keys", "businesses"
   add_foreign_key "locations", "businesses"
   add_foreign_key "locks", "locations"
   add_foreign_key "notifications", "businesses"

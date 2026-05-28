@@ -7,7 +7,7 @@ class Api::Public::V1::BaseController < ActionController::API
     token = request.headers["Authorization"]&.delete_prefix("Bearer ")
     return unauthorized! unless token.present?
 
-    @current_business = Business.find_by_api_key(token)
+    @current_business = ApiKey.authenticate(token)
     unauthorized! unless @current_business
   end
 

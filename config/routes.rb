@@ -19,8 +19,10 @@ Rails.application.routes.draw do
     get  "dashboard",              to: "dashboard#index",       as: :dashboard
     get  "activity",               to: "activity#index",        as: :activity
     get  "billing",                to: "billing#index",         as: :billing
-    get   "settings",                to: "settings#index",         as: :settings
-    patch "settings/stora",          to: "settings#update_stora",  as: :settings_stora
+    get    "settings",                to: "settings#index",         as: :settings
+    patch  "settings/stora",         to: "settings#update_stora",  as: :settings_stora
+    post   "settings/api_keys",      to: "settings#create_api_key", as: :settings_api_keys
+    delete "settings/api_keys/:id",  to: "settings#revoke_api_key", as: :settings_api_key
 
     get  "notifications",          to: "notifications#index",   as: :notifications
     get  "notifications/unread_count", to: "notifications#unread_count", as: :notifications_unread_count

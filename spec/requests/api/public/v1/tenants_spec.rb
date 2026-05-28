@@ -1,10 +1,11 @@
 require "swagger_helper"
 
 RSpec.describe "Api::Public::V1::Tenants", type: :request, openapi_spec: "public/v1/swagger.yaml" do
-  let(:business)      { create(:business, api_key_digest: Digest::SHA256.hexdigest("testkey")) }
-  let(:Authorization) { "Bearer nb_#{business.id}_testkey" }
+  let(:business)      { create(:business) }
+  let(:api_key)       { create(:api_key, business: business) }
+  let(:Authorization) { "Bearer nb_#{api_key.id}_testkey" }
 
-  before { business }
+  before { api_key }
 
   path "/api/public/v1/tenants" do
     get "List all tenants" do
