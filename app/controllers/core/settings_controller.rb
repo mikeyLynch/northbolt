@@ -8,6 +8,11 @@ class Core::SettingsController < Core::BaseController
     @locations   = @business.locations.order(:name)                        if @tab == "locations"
   end
 
+  def update_general
+    current_user.business.update!(name: params[:name].to_s.strip.presence || current_user.business.name)
+    redirect_to core_settings_path(tab: "general"), notice: "Settings saved."
+  end
+
   def create_api_key
     name = params[:api_key_name].presence
     return redirect_to(core_settings_path(tab: "api_keys"), alert: "Name can't be blank.") unless name

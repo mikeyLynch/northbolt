@@ -6,6 +6,18 @@ RSpec.describe "Core::Settings", type: :request do
 
   before { sign_in user }
 
+  describe "PATCH /settings" do
+    it "updates the business name" do
+      patch core_settings_general_path, params: { name: "New Name" }
+      expect(business.reload.name).to eq("New Name")
+    end
+
+    it "redirects to the general tab" do
+      patch core_settings_general_path, params: { name: "New Name" }
+      expect(response).to redirect_to(core_settings_path(tab: "general"))
+    end
+  end
+
   describe "GET /settings" do
     it "renders the general tab by default" do
       get core_settings_path
