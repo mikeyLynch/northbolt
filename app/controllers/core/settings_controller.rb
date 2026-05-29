@@ -3,8 +3,9 @@ class Core::SettingsController < Core::BaseController
     @tab      = params[:tab].presence_in(%w[general api_keys team locations integrations]) || "general"
     @business = current_user.business
     @api_keys    = @business.api_keys.recent                           if @tab == "api_keys"
-    @members     = @business.users.order(:first_name, :last_name)      if @tab == "team"
-    @invitations = @business.invitations.pending.order(created_at: :desc) if @tab == "team"
+    @members     = @business.users.order(:first_name, :last_name)         if @tab == "team"
+    @invitations = @business.invitations.pending.order(created_at: :desc)  if @tab == "team"
+    @locations   = @business.locations.order(:name)                        if @tab == "locations"
   end
 
   def create_api_key

@@ -1,0 +1,14 @@
+<div class="space-y-4">
+  <% @locations.each do |location| %>
+    <div class="bg-white border border-gray-200 rounded-xl px-6 py-5">
+      <p class="text-sm font-semibold text-gray-900"><%= location.name %></p>
+      <div class="mt-1.5 text-sm text-gray-500 space-y-0.5">
+        <p><%= location.address_line_1 %></p>
+        <% if location.address_line_2.present? %>
+          <p><%= location.address_line_2 %></p>
+        <% end %>
+        <p><%= [ location.city, location.postcode ].compact.join(", ") %></p>
+      </div>
+    </div>
+  <% end %>
+</div>
