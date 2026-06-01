@@ -1,4 +1,5 @@
 class Core::LocksController < Core::BaseController
+  AuditEntry = Struct.new(:kind, :occurred_at, :tenant, keyword_init: true)
   def index
     @locations = current_user.business.locations.order(:name)
     locks = current_user.business.locks.includes(:location)
@@ -46,7 +47,31 @@ class Core::LocksController < Core::BaseController
       @from = params[:from]
       @to   = params[:to]
     when "audit"
-      @access_events = @lock.access_events.recent.page(params[:page]).per(50)
+      entries = []
+
+      @lock.access_grants.includes(:tenant).each do |grant|
+        entries << AuditEntry.new(kind: "grant_issued",  occurred_at: grant.created_at, tenant: grant.tenant)
+        entries << AuditEntry.new(kind: "grant_revoked", occurred_at: grant.revoked_at, tenant: grant.tenant) if grant.revoked_at
+      end
+
+      @lock.access_events.each do |event|
+        entries << AuditEntry.new(kind: event.event_type, occurred_at: event.occurred_at, tenant: nil)
+      end
+
+      @audit_from = params[:audit_from]
+      @audit_to   = params[:audit_to]
+
+      if @audit_from.present?
+        from = Date.parse(@audit_from).beginning_of_day
+        entries.select! { |e| e.occurred_at >= from }
+      end
+      if @audit_to.present?
+        to = Date.parse(@audit_to).end_of_day
+        entries.select! { |e| e.occurred_at <= to }
+      end
+
+      sorted = entries.sort_by(&:occurred_at).reverse
+      @audit_entries = Kaminari.paginate_array(sorted).page(params[:page]).per(50)
     end
   end
 

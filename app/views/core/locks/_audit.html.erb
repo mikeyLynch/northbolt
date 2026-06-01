@@ -1,5 +1,23 @@
+<%= form_with url: core_lock_path(@lock), method: :get, data: { turbo_frame: "lock_tab" }, class: "flex items-center gap-3" do |f| %>
+  <%= f.hidden_field :tab, value: "audit" %>
+  <div class="flex items-center gap-2">
+    <label class="text-sm text-gray-500 shrink-0">From</label>
+    <input type="date" name="audit_from" value="<%= @audit_from %>"
+           class="text-sm bg-white border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent">
+  </div>
+  <div class="flex items-center gap-2">
+    <label class="text-sm text-gray-500 shrink-0">To</label>
+    <input type="date" name="audit_to" value="<%= @audit_to %>"
+           class="text-sm bg-white border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent">
+  </div>
+  <%= f.submit "Filter", class: "px-3 py-2 text-sm font-medium bg-gray-900 text-white rounded-lg hover:bg-gray-700 transition-colors cursor-pointer" %>
+  <% if @audit_from.present? || @audit_to.present? %>
+    <%= link_to "Clear", core_lock_path(@lock, tab: "audit"), class: "text-sm text-gray-400 hover:text-gray-900", data: { turbo_frame: "lock_tab" } %>
+  <% end %>
+<% end %>
+
 <div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
-  <% if @access_events.any? %>
+  <% if @audit_entries.any? %>
     <table class="w-full text-sm">
       <thead>
         <tr class="border-b border-gray-100 bg-gray-50">
@@ -8,31 +26,45 @@
         </tr>
       </thead>
       <tbody class="divide-y divide-gray-100">
-        <% @access_events.each do |event| %>
+        <% @audit_entries.each do |entry| %>
           <tr class="hover:bg-gray-50 transition-colors">
             <td class="px-4 py-3">
               <div class="flex items-center gap-2.5">
-                <div class="w-6 h-6 rounded-full flex items-center justify-center shrink-0 <%= event_icon_bg(event.event_type) %>">
-                  <%= render "core/activity/event_icon", event_type: event.event_type %>
+                <div class="w-6 h-6 rounded-full flex items-center justify-center shrink-0 <%= event_icon_bg(entry.kind) %>">
+                  <%= render "core/activity/event_icon", event_type: entry.kind %>
                 </div>
-                <span class="font-medium text-gray-900"><%= event_label(event.event_type) %></span>
+                <div>
+                  <span class="font-medium text-gray-900"><%= event_label(entry.kind) %></span>
+                  <% if entry.tenant %>
+                    <span class="text-gray-400"> · </span>
+                    <%= link_to entry.tenant.full_name, core_tenant_path(entry.tenant),
+                          class: "text-gray-500 hover:text-gray-900 hover:underline",
+                          data: { turbo_frame: "_top" } %>
+                  <% end %>
+                </div>
               </div>
             </td>
-            <td class="px-4 py-3 text-gray-500">
-              <time datetime="<%= event.occurred_at.iso8601 %>">
-                <%= event.occurred_at.strftime("%-d %b %Y, %H:%M:%S") %>
+            <td class="px-4 py-3 text-gray-500 whitespace-nowrap">
+              <time datetime="<%= entry.occurred_at.iso8601 %>">
+                <%= entry.occurred_at.strftime("%-d %b %Y, %H:%M") %>
               </time>
             </td>
           </tr>
         <% end %>
       </tbody>
     </table>
-    <% if @access_events.total_pages > 1 %>
+    <% if @audit_entries.total_pages > 1 %>
       <div class="px-4 py-3 border-t border-gray-100">
-        <%= paginate @access_events %>
+        <%= paginate @audit_entries %>
       </div>
     <% end %>
   <% else %>
-    <div class="px-4 py-12 text-center text-sm text-gray-400">No access events recorded yet.</div>
+    <div class="px-4 py-12 text-center text-sm text-gray-400">
+      <% if @audit_from.present? || @audit_to.present? %>
+        No events found for the selected dates.
+      <% else %>
+        No audit events recorded yet.
+      <% end %>
+    </div>
   <% end %>
 </div>
