@@ -184,4 +184,34 @@ RSpec.describe "Core::Tenants", type: :request do
       expect(response).to have_http_status(:not_found)
     end
   end
+
+  describe "permission enforcement" do
+    let(:low_user) do
+      matrix = business.permission_matrix.merge("low" => ["view_activity"])
+      business.update!(permission_matrix: matrix)
+      create(:user, business: business, role: "low")
+    end
+
+    before { sign_in low_user }
+
+    it "blocks creating a tenant without manage_tenants" do
+      post core_tenants_path, params: { tenant: { first_name: "X", last_name: "Y" } }
+      expect(response).to redirect_to(core_dashboard_path)
+    end
+
+    it "blocks editing a tenant without manage_tenants" do
+      get edit_core_tenant_path(tenant)
+      expect(response).to redirect_to(core_dashboard_path)
+    end
+
+    it "blocks deleting a tenant without manage_tenants" do
+      delete core_tenant_path(tenant)
+      expect(response).to redirect_to(core_dashboard_path)
+    end
+
+    it "still allows viewing a tenant (show is always accessible)" do
+      get core_tenant_path(tenant)
+      expect(response).to have_http_status(:ok)
+    end
+  end
 end

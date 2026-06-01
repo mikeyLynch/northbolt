@@ -76,9 +76,15 @@ RSpec.describe Invitation, type: :model do
       expect(user.email).to eq(invitation.email)
     end
 
-    it "creates the user with member role" do
+    it "creates the user with the invitation's role" do
+      invitation.update!(role: "high")
       user = invitation.accept!(first_name: "Alice", last_name: "Smith", password: "password123")
-      expect(user).to be_member
+      expect(user).to be_high
+    end
+
+    it "defaults to medium role" do
+      user = invitation.accept!(first_name: "Alice", last_name: "Smith", password: "password123")
+      expect(user).to be_medium
     end
 
     it "marks the invitation as accepted" do

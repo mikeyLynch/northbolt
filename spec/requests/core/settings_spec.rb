@@ -150,7 +150,7 @@ RSpec.describe "Core::Settings", type: :request do
   end
 
   describe "DELETE /settings/members/:id" do
-    let!(:member) { create(:user, business: business, role: "member") }
+    let!(:member) { create(:user, business: business, role: "medium") }
 
     it "removes the member" do
       expect {
@@ -194,6 +194,80 @@ RSpec.describe "Core::Settings", type: :request do
       other_key = create(:api_key)
       delete core_settings_api_key_path(other_key)
       expect(other_key.reload.revoked_at).to be_nil
+    end
+  end
+
+  describe "PATCH /settings/permissions" do
+    it "updates the permission matrix as owner" do
+      patch core_settings_permissions_path, params: {
+        permissions: { high: ["grant_access"], medium: [], low: [] }
+      }
+      expect(business.reload.permission_matrix["high"]).to eq(["grant_access"])
+      expect(business.reload.permission_matrix["medium"]).to eq([])
+    end
+
+    it "redirects to the permissions tab" do
+      patch core_settings_permissions_path, params: { permissions: { high: [], medium: [], low: [] } }
+      expect(response).to redirect_to(core_settings_path(tab: "permissions"))
+    end
+
+    it "strips unknown permissions from the matrix" do
+      patch core_settings_permissions_path, params: {
+        permissions: { high: ["grant_access", "fly_a_spaceship"], medium: [], low: [] }
+      }
+      expect(business.reload.permission_matrix["high"]).to eq(["grant_access"])
+    end
+
+    context "as a non-owner" do
+      before do
+        sign_out user
+        sign_in create(:user, business: business, role: "high")
+      end
+
+      it "redirects to dashboard" do
+        patch core_settings_permissions_path, params: { permissions: { high: [], medium: [], low: [] } }
+        expect(response).to redirect_to(core_dashboard_path)
+      end
+
+      it "does not change the matrix" do
+        original = business.permission_matrix.dup
+        patch core_settings_permissions_path, params: { permissions: { high: [], medium: [], low: [] } }
+        expect(business.reload.permission_matrix).to eq(original)
+      end
+    end
+  end
+
+  describe "POST /settings/invitations (with role)" do
+    it "sets the role on the invitation" do
+      post core_settings_invitations_path, params: { email: "new@example.com", role: "low" }
+      expect(business.invitations.last.role).to eq("low")
+    end
+
+    it "defaults to medium for an invalid role" do
+      post core_settings_invitations_path, params: { email: "new@example.com", role: "superadmin" }
+      expect(business.invitations.last.role).to eq("medium")
+    end
+  end
+
+  describe "DELETE /settings/members/:id (owner protection)" do
+    let!(:owner_member) { create(:user, business: business, role: "owner") }
+
+    it "owner can remove another owner" do
+      delete core_settings_member_path(owner_member)
+      expect(User.exists?(owner_member.id)).to be false
+    end
+
+    context "as a high user" do
+      before do
+        sign_out user
+        sign_in create(:user, business: business, role: "high")
+      end
+
+      it "cannot remove an owner" do
+        delete core_settings_member_path(owner_member)
+        expect(flash[:alert]).to be_present
+        expect(User.exists?(owner_member.id)).to be true
+      end
     end
   end
 end

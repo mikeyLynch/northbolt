@@ -26,6 +26,27 @@ RSpec.describe "Core::Tenants::AccessGrants", type: :request do
     end
   end
 
+  describe "permission enforcement" do
+    before do
+      matrix = business.permission_matrix.merge("low" => [])
+      business.update!(permission_matrix: matrix)
+      sign_out user
+      sign_in create(:user, business: business, role: "low")
+    end
+
+    it "blocks access without grant_access permission" do
+      get new_core_tenant_access_grant_path(tenant)
+      expect(response).to redirect_to(core_dashboard_path)
+    end
+
+    it "blocks creating a grant without grant_access permission" do
+      post core_tenant_access_grants_path(tenant), params: {
+        access_grant: { lock_id: lock.id, ends_at: 1.month.from_now.to_date.to_s }
+      }
+      expect(response).to redirect_to(core_dashboard_path)
+    end
+  end
+
   describe "POST /tenants/:tenant_id/access_grants" do
     let(:valid_params) do
       { access_grant: { lock_id: lock.id, ends_at: 1.month.from_now.to_date.to_s } }
