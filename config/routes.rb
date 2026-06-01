@@ -16,6 +16,10 @@ Rails.application.routes.draw do
   end
 
   namespace :core, path: "" do
+    get   "account",          to: "account#show",           as: :account
+    patch "account/profile",  to: "account#update_profile", as: :account_profile
+    patch "account/password", to: "account#update_password", as: :account_password
+
     get  "dashboard",              to: "dashboard#index",       as: :dashboard
     get  "activity",               to: "activity#index",        as: :activity
     get  "billing",                to: "billing#index",         as: :billing
