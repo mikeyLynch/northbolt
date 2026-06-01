@@ -33,7 +33,7 @@
         <%= link_to "Overview", core_lock_path(@lock, tab: "overview"),
               class: "px-4 py-2 text-sm font-medium border-b-2 transition-colors #{@tab == 'overview' ? 'border-gray-900 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-900'}",
               data: { turbo_frame: "lock_tab", turbo_action: "advance" } %>
-        <%= link_to "Historical access grants", core_lock_path(@lock, tab: "history"),
+        <%= link_to "Access grants", core_lock_path(@lock, tab: "history"),
               class: "px-4 py-2 text-sm font-medium border-b-2 transition-colors #{@tab == 'history' ? 'border-gray-900 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-900'}",
               data: { turbo_frame: "lock_tab", turbo_action: "advance" } %>
         <%= link_to "Audit trail", core_lock_path(@lock, tab: "audit"),

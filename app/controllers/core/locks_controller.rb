@@ -39,7 +39,12 @@ class Core::LocksController < Core::BaseController
                             .order(:starts_at)
                             .first
     when "history"
-      @access_grants = @lock.access_grants.includes(:tenant).order(created_at: :desc)
+      grants = @lock.access_grants.includes(:tenant).order(created_at: :desc)
+      grants = grants.where("starts_at >= ?", Date.parse(params[:from])) if params[:from].present?
+      grants = grants.where("ends_at <= ?",   Date.parse(params[:to]).end_of_day) if params[:to].present?
+      @access_grants = grants
+      @from = params[:from]
+      @to   = params[:to]
     when "audit"
       @access_events = @lock.access_events.recent.page(params[:page]).per(50)
     end
