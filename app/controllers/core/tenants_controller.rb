@@ -30,9 +30,12 @@ class Core::TenantsController < Core::BaseController
 
     case @tab
     when "locks"
-      @access_grants = @tenant.access_grants
-        .includes(lock: :location)
-        .order(Arel.sql("CASE WHEN revoked_at IS NULL AND ends_at > NOW() THEN 0 ELSE 1 END, created_at DESC"))
+      grants = @tenant.access_grants.includes(lock: :location)
+      grants = grants.where("starts_at >= ?", Date.parse(params[:from])) if params[:from].present?
+      grants = grants.where("ends_at <= ?",   Date.parse(params[:to]).end_of_day) if params[:to].present?
+      @access_grants = grants.order(Arel.sql("CASE WHEN revoked_at IS NULL AND ends_at > NOW() THEN 0 ELSE 1 END, created_at DESC"))
+      @from = params[:from]
+      @to   = params[:to]
     when "details"
       @active_grants = @tenant.access_grants
         .joins(lock: :location)

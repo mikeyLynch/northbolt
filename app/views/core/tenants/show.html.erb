@@ -27,7 +27,7 @@
         <%= link_to "Details", core_tenant_path(@tenant, tab: "details"),
               class: "px-4 py-2 text-sm font-medium border-b-2 transition-colors #{@tab == 'details' ? 'border-gray-900 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-900'}",
               data: { turbo_frame: "tenant_tab", turbo_action: "advance" } %>
-        <%= link_to "Lock history", core_tenant_path(@tenant, tab: "locks"),
+        <%= link_to "Access grants", core_tenant_path(@tenant, tab: "locks"),
               class: "px-4 py-2 text-sm font-medium border-b-2 transition-colors #{@tab == 'locks' ? 'border-gray-900 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-900'}",
               data: { turbo_frame: "tenant_tab", turbo_action: "advance" } %>
         <%= link_to "Audit trail", core_tenant_path(@tenant, tab: "audit"),

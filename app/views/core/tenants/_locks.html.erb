@@ -1,3 +1,21 @@
+<%= form_with url: core_tenant_path(@tenant), method: :get, data: { turbo_frame: "tenant_tab" }, class: "flex items-center gap-3" do |f| %>
+  <%= f.hidden_field :tab, value: "locks" %>
+  <div class="flex items-center gap-2">
+    <label class="text-sm text-gray-500 shrink-0">From</label>
+    <input type="date" name="from" value="<%= @from %>"
+           class="text-sm bg-white border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent">
+  </div>
+  <div class="flex items-center gap-2">
+    <label class="text-sm text-gray-500 shrink-0">To</label>
+    <input type="date" name="to" value="<%= @to %>"
+           class="text-sm bg-white border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent">
+  </div>
+  <%= f.submit "Filter", class: "px-3 py-2 text-sm font-medium bg-gray-900 text-white rounded-lg hover:bg-gray-700 transition-colors cursor-pointer" %>
+  <% if @from.present? || @to.present? %>
+    <%= link_to "Clear", core_tenant_path(@tenant, tab: "locks"), class: "text-sm text-gray-400 hover:text-gray-900", data: { turbo_frame: "tenant_tab" } %>
+  <% end %>
+<% end %>
+
 <div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
   <% if @access_grants.any? %>
     <table class="w-full text-sm">
@@ -42,6 +60,12 @@
       </tbody>
     </table>
   <% else %>
-    <div class="px-4 py-12 text-center text-sm text-gray-400">No lock history yet.</div>
+    <div class="px-4 py-12 text-center text-sm text-gray-400">
+      <% if @from.present? || @to.present? %>
+        No access grants found for the selected dates.
+      <% else %>
+        No access grants yet.
+      <% end %>
+    </div>
   <% end %>
 </div>
