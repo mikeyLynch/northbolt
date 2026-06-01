@@ -4,9 +4,38 @@
 
   <h1 class="text-lg font-semibold text-gray-900">Activity</h1>
 
+  <%# Filter bar %>
+  <div class="flex flex-wrap items-center gap-2">
+    <%# Quick links %>
+    <% [["Today", "today"], ["Yesterday", "yesterday"], ["Past month", "month"]].each do |label, period| %>
+      <%= link_to label, core_activity_path(period: period),
+            class: "px-3 py-2 text-sm font-medium rounded-lg border transition-colors #{@period == period ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-500 border-gray-200 hover:text-gray-900 hover:border-gray-300'}" %>
+    <% end %>
+
+    <div class="h-5 w-px bg-gray-200"></div>
+
+    <%# Custom range %>
+    <%= form_with url: core_activity_path, method: :get, class: "flex items-center gap-2" do |f| %>
+      <input type="date" name="from" value="<%= @period ? nil : @from %>"
+             class="text-sm bg-white border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent">
+      <span class="text-sm text-gray-400">to</span>
+      <input type="date" name="to" value="<%= @period ? nil : @to %>"
+             class="text-sm bg-white border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent">
+      <%= f.submit "Filter", class: "px-3 py-2 text-sm font-medium bg-gray-900 text-white rounded-lg hover:bg-gray-700 transition-colors cursor-pointer" %>
+    <% end %>
+
+    <% if @from.present? || @to.present? || @period.present? %>
+      <%= link_to "Clear", core_activity_path, class: "text-sm text-gray-400 hover:text-gray-900" %>
+    <% end %>
+  </div>
+
   <% if @events.none? %>
     <div class="bg-white border border-gray-200 rounded-xl px-4 py-12 text-center text-sm text-gray-400">
-      No activity yet. Events will appear here once your locks start reporting in.
+      <% if @from.present? || @to.present? || @period.present? %>
+        No activity found for the selected period.
+      <% else %>
+        No activity yet. Events will appear here once your locks start reporting in.
+      <% end %>
     </div>
   <% else %>
     <div class="bg-white border border-gray-200 rounded-xl divide-y divide-gray-100">
