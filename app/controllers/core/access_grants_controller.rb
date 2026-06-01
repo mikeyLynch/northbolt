@@ -1,5 +1,7 @@
 class Core::AccessGrantsController < Core::BaseController
   before_action :set_grant
+  before_action -> { require_permission(:grant_access) }, only: [ :edit, :update ]
+  before_action -> { require_permission(:revoke_access) }, only: [ :revoke ]
 
   def edit
     @return_to = params[:return_to]

@@ -1,4 +1,6 @@
 class Core::ActivityController < Core::BaseController
+  before_action -> { require_permission(:view_activity) }
+
   def index
     @period = params[:period]
     @from   = params[:from]

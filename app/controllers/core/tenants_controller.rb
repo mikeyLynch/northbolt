@@ -1,6 +1,7 @@
 class Core::TenantsController < Core::BaseController
   TenantAuditEntry = Struct.new(:kind, :occurred_at, :lock, keyword_init: true)
   before_action :set_tenant, only: [ :show, :edit, :update, :destroy ]
+  before_action -> { require_permission(:manage_tenants) }, only: [ :new, :create, :edit, :update, :destroy ]
 
   def index
     tenants = current_user.business.tenants

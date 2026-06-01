@@ -1,6 +1,7 @@
 class Core::Locks::AccessGrantsController < Core::BaseController
   before_action :set_lock
   before_action :ensure_no_active_grant
+  before_action -> { require_permission(:grant_access) }
 
   def new
     @tenants = current_user.business.tenants.order(:last_name, :first_name)

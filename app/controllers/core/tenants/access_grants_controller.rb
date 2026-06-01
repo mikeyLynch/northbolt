@@ -1,5 +1,6 @@
 class Core::Tenants::AccessGrantsController < Core::BaseController
   before_action :set_tenant
+  before_action -> { require_permission(:grant_access) }
 
   def new
     @available_locks = available_locks

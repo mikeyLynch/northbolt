@@ -24,7 +24,8 @@ Rails.application.routes.draw do
     get  "activity",               to: "activity#index",        as: :activity
     get  "billing",                to: "billing#index",         as: :billing
     get    "settings",                to: "settings#index",         as: :settings
-    patch  "settings",                to: "settings#update_general", as: :settings_general
+    patch  "settings",                to: "settings#update_general",     as: :settings_general
+    patch  "settings/permissions",    to: "settings#update_permissions", as: :settings_permissions
     patch  "settings/stora",         to: "settings#update_stora",  as: :settings_stora
     post   "settings/api_keys",              to: "settings#create_api_key",   as: :settings_api_keys
     delete "settings/api_keys/:id",          to: "settings#revoke_api_key",   as: :settings_api_key

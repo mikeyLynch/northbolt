@@ -19,6 +19,9 @@
         <%= link_to "Team", core_settings_path(tab: "team"),
               class: "px-4 py-2 text-sm font-medium border-b-2 transition-colors #{@tab == 'team' ? 'border-gray-900 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-900'}",
               data: { turbo_frame: "settings_tab", turbo_action: "advance" } %>
+        <%= link_to "Permissions", core_settings_path(tab: "permissions"),
+              class: "px-4 py-2 text-sm font-medium border-b-2 transition-colors #{@tab == 'permissions' ? 'border-gray-900 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-900'}",
+              data: { turbo_frame: "settings_tab", turbo_action: "advance" } %>
         <%= link_to "Locations", core_settings_path(tab: "locations"),
               class: "px-4 py-2 text-sm font-medium border-b-2 transition-colors #{@tab == 'locations' ? 'border-gray-900 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-900'}",
               data: { turbo_frame: "settings_tab", turbo_action: "advance" } %>
@@ -30,6 +33,8 @@
         <%= render "core/settings/api_keys" %>
       <% elsif @tab == "team" %>
         <%= render "core/settings/team" %>
+      <% elsif @tab == "permissions" %>
+        <%= render "core/settings/permissions" %>
       <% elsif @tab == "locations" %>
         <%= render "core/settings/locations" %>
       <% else %>

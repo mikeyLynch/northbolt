@@ -15,6 +15,11 @@
           required
           class="flex-1 text-sm border border-gray-200 rounded-lg px-3 py-3 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
         >
+        <select name="role" class="text-sm border border-gray-200 rounded-lg px-3 py-3 bg-white focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent shrink-0">
+          <% %w[high medium low].each do |role| %>
+            <option value="<%= role %>"><%= Business::ROLE_LABELS[role] %></option>
+          <% end %>
+        </select>
         <%= f.submit "Send invite",
               class: "px-4 py-3 text-sm font-medium text-white bg-gray-900 rounded-lg hover:bg-gray-700 transition-colors cursor-pointer shrink-0" %>
       <% end %>
@@ -32,8 +37,10 @@
           <div class="space-y-0.5 min-w-0">
             <div class="flex items-center gap-2">
               <p class="text-sm font-medium text-gray-900"><%= member.first_name %> <%= member.last_name %></p>
-              <span class="text-xs font-medium px-1.5 py-0.5 rounded-md <%= member.owner? ? 'bg-gray-100 text-gray-600' : 'bg-blue-50 text-blue-600' %>">
-                <%= member.owner? ? "Owner" : "Member" %>
+              <% role_label = member.owner? ? "Owner" : Business::ROLE_LABELS.fetch(member.role, member.role.capitalize) %>
+              <% role_classes = member.owner? ? "bg-gray-100 text-gray-600" : "bg-blue-50 text-blue-600" %>
+              <span class="text-xs font-medium px-1.5 py-0.5 rounded-md <%= role_classes %>">
+                <%= role_label %>
               </span>
             </div>
             <p class="text-xs text-gray-400"><%= member.email %></p>
@@ -60,7 +67,11 @@
           <li class="px-6 py-4 flex items-center justify-between gap-4">
             <div class="space-y-0.5 min-w-0">
               <p class="text-sm font-medium text-gray-900"><%= invitation.email %></p>
-              <p class="text-xs text-gray-400">Invited by <%= invitation.invited_by.first_name %> · <%= time_ago_in_words(invitation.created_at) %> ago</p>
+              <p class="text-xs text-gray-400">
+                <%= Business::ROLE_LABELS[invitation.role] %> ·
+                Invited by <%= invitation.invited_by.first_name %> ·
+                <%= time_ago_in_words(invitation.created_at) %> ago
+              </p>
             </div>
             <div class="flex items-center gap-3 shrink-0">
               <%= button_to "Resend", core_resend_settings_invitation_path(invitation),

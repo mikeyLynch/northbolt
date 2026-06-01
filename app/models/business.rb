@@ -1,4 +1,13 @@
 class Business < ApplicationRecord
+  PERMISSIONS = %w[manage_team manage_settings manage_api_keys manage_tenants grant_access revoke_access view_activity].freeze
+
+  DEFAULT_PERMISSION_MATRIX = {
+    "high"   => %w[manage_team manage_settings manage_api_keys manage_tenants grant_access revoke_access view_activity],
+    "medium" => %w[manage_tenants grant_access revoke_access view_activity],
+    "low"    => %w[grant_access view_activity]
+  }.freeze
+
+  ROLE_LABELS = { "high" => "High", "medium" => "Medium", "low" => "Low" }.freeze
   has_many :locations,  dependent: :destroy
   has_many :locks,      through: :locations
   has_many :tenants,    dependent: :destroy
@@ -8,6 +17,10 @@ class Business < ApplicationRecord
   has_many :invitations,   dependent: :destroy
 
   validates :name, presence: true
+
+  def role_can?(role, permission)
+    permission_matrix.fetch(role.to_s, []).include?(permission.to_s)
+  end
 
   def generate_stora_webhook_token!
     update!(stora_webhook_token: SecureRandom.hex(16))

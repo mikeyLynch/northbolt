@@ -1,0 +1,57 @@
+<% unless current_user.owner? %>
+  <div class="bg-amber-50 border border-amber-200 rounded-xl px-5 py-3 text-sm text-amber-800">
+    Only owners can modify permissions.
+  </div>
+<% end %>
+
+<%= form_with url: core_settings_permissions_path, method: :patch do |f| %>
+  <div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
+    <table class="w-full text-sm">
+      <thead>
+        <tr class="border-b border-gray-100 bg-gray-50">
+          <th class="px-6 py-3 text-left font-medium text-gray-500 w-1/2">Permission</th>
+          <th class="px-6 py-3 text-center font-medium text-gray-500">High</th>
+          <th class="px-6 py-3 text-center font-medium text-gray-500">Medium</th>
+          <th class="px-6 py-3 text-center font-medium text-gray-500">Low</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100">
+        <%
+          permission_labels = {
+            "manage_team"     => { label: "Manage team",     desc: "Invite and remove members" },
+            "manage_settings" => { label: "Manage settings", desc: "Business details and integrations" },
+            "manage_api_keys" => { label: "Manage API keys", desc: "Create and revoke API keys" },
+            "manage_tenants"  => { label: "Manage tenants",  desc: "Create, edit and delete tenants" },
+            "grant_access"    => { label: "Grant access",    desc: "Issue access grants to tenants" },
+            "revoke_access"   => { label: "Revoke access",   desc: "Revoke active access grants" },
+            "view_activity"   => { label: "View activity",   desc: "Access the activity feed and audit trails" }
+          }
+        %>
+        <% Business::PERMISSIONS.each do |permission| %>
+          <% meta = permission_labels[permission] %>
+          <tr class="hover:bg-gray-50 transition-colors">
+            <td class="px-6 py-4">
+              <p class="font-medium text-gray-900"><%= meta[:label] %></p>
+              <p class="text-xs text-gray-400 mt-0.5"><%= meta[:desc] %></p>
+            </td>
+            <% %w[high medium low].each do |role| %>
+              <td class="px-6 py-4 text-center">
+                <input type="checkbox"
+                       name="permissions[<%= role %>][]"
+                       value="<%= permission %>"
+                       <%= @business.permission_matrix.fetch(role, []).include?(permission) ? "checked" : "" %>
+                       <%= current_user.owner? ? "" : "disabled" %>
+                       class="w-4 h-4 rounded border-gray-300 text-gray-900 focus:ring-gray-900 cursor-pointer disabled:cursor-not-allowed disabled:opacity-40">
+              </td>
+            <% end %>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <% if current_user.owner? %>
+    <%= f.submit "Save permissions",
+          class: "px-4 py-2.5 text-sm font-medium text-white bg-gray-900 rounded-lg hover:bg-gray-700 transition-colors cursor-pointer" %>
+  <% end %>
+<% end %>

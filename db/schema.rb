@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_28_162730) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_01_141625) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -51,6 +51,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_28_162730) do
   create_table "businesses", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "name", null: false
+    t.jsonb "permission_matrix", default: {"low" => ["grant_access", "view_activity"], "high" => ["manage_team", "manage_settings", "manage_api_keys", "manage_tenants", "grant_access", "revoke_access", "view_activity"], "medium" => ["manage_tenants", "grant_access", "revoke_access", "view_activity"]}, null: false
     t.string "stora_webhook_secret"
     t.string "stora_webhook_token"
     t.datetime "updated_at", null: false
@@ -63,6 +64,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_28_162730) do
     t.datetime "created_at", null: false
     t.string "email", null: false
     t.bigint "invited_by_id", null: false
+    t.string "role", default: "medium", null: false
     t.string "token", null: false
     t.datetime "updated_at", null: false
     t.index ["business_id", "email"], name: "index_invitations_on_business_id_and_email", unique: true
