@@ -24,8 +24,8 @@
   <turbo-frame id="tenant_tab">
     <div class="space-y-6">
       <div class="flex gap-1 border-b border-gray-200">
-        <%= link_to "Details", core_tenant_path(@tenant, tab: "details"),
-              class: "px-4 py-2 text-sm font-medium border-b-2 transition-colors #{@tab == 'details' ? 'border-gray-900 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-900'}",
+        <%= link_to "Overview", core_tenant_path(@tenant, tab: "overview"),
+              class: "px-4 py-2 text-sm font-medium border-b-2 transition-colors #{@tab == 'overview' ? 'border-gray-900 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-900'}",
               data: { turbo_frame: "tenant_tab", turbo_action: "advance" } %>
         <%= link_to "Access grants", core_tenant_path(@tenant, tab: "locks"),
               class: "px-4 py-2 text-sm font-medium border-b-2 transition-colors #{@tab == 'locks' ? 'border-gray-900 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-900'}",

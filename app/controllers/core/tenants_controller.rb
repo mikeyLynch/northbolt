@@ -27,7 +27,7 @@ class Core::TenantsController < Core::BaseController
   end
 
   def show
-    @tab = params[:tab].presence_in(%w[details locks audit]) || "details"
+    @tab = params[:tab].presence_in(%w[overview locks audit]) || "overview"
 
     case @tab
     when "locks"
@@ -58,7 +58,7 @@ class Core::TenantsController < Core::BaseController
 
       sorted = entries.sort_by(&:occurred_at).reverse
       @audit_entries = Kaminari.paginate_array(sorted).page(params[:page]).per(50)
-    when "details"
+    when "overview"
       @active_grants = @tenant.access_grants
         .joins(lock: :location)
         .includes(lock: :location)
