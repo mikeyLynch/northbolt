@@ -1,4 +1,69 @@
-<div class="bg-white border border-gray-200 rounded-xl px-4 py-12 text-center space-y-1">
-  <p class="text-sm font-medium text-gray-900">Audit trail coming soon</p>
-  <p class="text-sm text-gray-400">Lock opens, closes, PIN events and more will appear here.</p>
+<%= form_with url: core_tenant_path(@tenant), method: :get, data: { turbo_frame: "tenant_tab" }, class: "flex items-center gap-3" do |f| %>
+  <%= f.hidden_field :tab, value: "audit" %>
+  <div class="flex items-center gap-2">
+    <label class="text-sm text-gray-500 shrink-0">From</label>
+    <input type="date" name="audit_from" value="<%= @audit_from %>"
+           class="text-sm bg-white border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent">
+  </div>
+  <div class="flex items-center gap-2">
+    <label class="text-sm text-gray-500 shrink-0">To</label>
+    <input type="date" name="audit_to" value="<%= @audit_to %>"
+           class="text-sm bg-white border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent">
+  </div>
+  <%= f.submit "Filter", class: "px-3 py-2 text-sm font-medium bg-gray-900 text-white rounded-lg hover:bg-gray-700 transition-colors cursor-pointer" %>
+  <% if @audit_from.present? || @audit_to.present? %>
+    <%= link_to "Clear", core_tenant_path(@tenant, tab: "audit"), class: "text-sm text-gray-400 hover:text-gray-900", data: { turbo_frame: "tenant_tab" } %>
+  <% end %>
+<% end %>
+
+<div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
+  <% if @audit_entries.any? %>
+    <table class="w-full text-sm">
+      <thead>
+        <tr class="border-b border-gray-100 bg-gray-50">
+          <th class="px-4 py-3 text-left font-medium text-gray-500">Event</th>
+          <th class="px-4 py-3 text-left font-medium text-gray-500">When</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100">
+        <% @audit_entries.each do |entry| %>
+          <tr class="hover:bg-gray-50 transition-colors">
+            <td class="px-4 py-3">
+              <div class="flex items-center gap-2.5">
+                <div class="w-6 h-6 rounded-full flex items-center justify-center shrink-0 <%= event_icon_bg(entry.kind) %>">
+                  <%= render "core/activity/event_icon", event_type: entry.kind %>
+                </div>
+                <div>
+                  <span class="font-medium text-gray-900"><%= event_label(entry.kind) %></span>
+                  <span class="text-gray-400"> · </span>
+                  <%= link_to "Unit #{entry.lock.unit_identifier}, #{entry.lock.location.name}",
+                        core_lock_path(entry.lock),
+                        class: "text-gray-500 hover:text-gray-900 hover:underline",
+                        data: { turbo_frame: "_top" } %>
+                </div>
+              </div>
+            </td>
+            <td class="px-4 py-3 text-gray-500 whitespace-nowrap">
+              <time datetime="<%= entry.occurred_at.iso8601 %>">
+                <%= entry.occurred_at.strftime("%-d %b %Y, %H:%M") %>
+              </time>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+    <% if @audit_entries.total_pages > 1 %>
+      <div class="px-4 py-3 border-t border-gray-100">
+        <%= paginate @audit_entries %>
+      </div>
+    <% end %>
+  <% else %>
+    <div class="px-4 py-12 text-center text-sm text-gray-400">
+      <% if @audit_from.present? || @audit_to.present? %>
+        No events found for the selected dates.
+      <% else %>
+        No audit events recorded yet.
+      <% end %>
+    </div>
+  <% end %>
 </div>

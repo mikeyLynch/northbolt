@@ -1,4 +1,5 @@
 class Core::TenantsController < Core::BaseController
+  TenantAuditEntry = Struct.new(:kind, :occurred_at, :lock, keyword_init: true)
   before_action :set_tenant, only: [ :show, :edit, :update, :destroy ]
 
   def index
@@ -36,6 +37,27 @@ class Core::TenantsController < Core::BaseController
       @access_grants = grants.order(Arel.sql("CASE WHEN revoked_at IS NULL AND ends_at > NOW() THEN 0 ELSE 1 END, created_at DESC"))
       @from = params[:from]
       @to   = params[:to]
+    when "audit"
+      entries = []
+      @tenant.access_grants.includes(lock: :location).each do |grant|
+        entries << TenantAuditEntry.new(kind: "grant_issued",  occurred_at: grant.created_at, lock: grant.lock)
+        entries << TenantAuditEntry.new(kind: "grant_revoked", occurred_at: grant.revoked_at, lock: grant.lock) if grant.revoked_at
+      end
+
+      @audit_from = params[:audit_from]
+      @audit_to   = params[:audit_to]
+
+      if @audit_from.present?
+        from = Date.parse(@audit_from).beginning_of_day
+        entries.select! { |e| e.occurred_at >= from }
+      end
+      if @audit_to.present?
+        to = Date.parse(@audit_to).end_of_day
+        entries.select! { |e| e.occurred_at <= to }
+      end
+
+      sorted = entries.sort_by(&:occurred_at).reverse
+      @audit_entries = Kaminari.paginate_array(sorted).page(params[:page]).per(50)
     when "details"
       @active_grants = @tenant.access_grants
         .joins(lock: :location)
