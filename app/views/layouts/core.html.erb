@@ -12,7 +12,7 @@
     <%= javascript_importmap_tags %>
   </head>
   <body class="bg-gray-50 text-gray-900 antialiased"
-        data-controller="nav notifications"
+        data-controller="nav notifications support"
         data-notifications-url-value="<%= core_notifications_path %>"
         data-notifications-unread-count-url-value="<%= core_notifications_unread_count_path %>">
 
@@ -130,7 +130,15 @@
 
     <!-- Main content -->
     <main class="lg:pl-64 pt-14 lg:pt-0 min-h-screen">
-      <header class="hidden lg:flex sticky top-0 z-30 bg-white border-b border-gray-200 h-16 items-center justify-end px-6">
+      <header class="hidden lg:flex sticky top-0 z-30 bg-white border-b border-gray-200 h-16 items-center justify-end gap-1 px-6">
+        <%# Support button %>
+        <button data-action="support#open"
+                class="relative p-2 text-gray-400 hover:text-gray-900 rounded-lg hover:bg-gray-100 transition-colors"
+                title="Help & support">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+          </svg>
+        </button>
         <%= render "core/notifications/bell" %>
       </header>
       <div class="p-6">
@@ -162,6 +170,126 @@
         <turbo-frame id="notifications_frame" src="<%= core_notifications_path %>">
           <div class="p-4 text-sm text-gray-400 text-center">Loading...</div>
         </turbo-frame>
+      </div>
+
+    </div>
+
+    <!-- Support backdrop -->
+    <div data-support-target="backdrop"
+         data-action="click->support#close"
+         class="hidden fixed inset-0 z-60 bg-gray-900/40">
+    </div>
+
+    <!-- Support drawer -->
+    <div data-support-target="drawer"
+         class="fixed inset-y-0 right-0 z-70 w-full sm:w-96 bg-white border-l border-gray-200 shadow-xl flex flex-col translate-x-full transition-transform duration-300">
+
+      <%# Header %>
+      <div class="flex items-center justify-between px-4 py-4 border-b border-gray-100 shrink-0">
+        <div class="flex items-center gap-2">
+          <button data-support-target="backButton"
+                  data-action="support#showArticles"
+                  class="hidden p-1 -ml-1 text-gray-400 hover:text-gray-900 rounded-lg hover:bg-gray-100 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          <h2 data-support-target="drawerTitle" class="text-sm font-semibold text-gray-900">Help & support</h2>
+        </div>
+        <button data-action="support#close" class="p-1 text-gray-400 hover:text-gray-900 rounded-lg hover:bg-gray-100 transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <%# Articles view %>
+      <div data-support-target="articlesView" class="flex flex-col flex-1 min-h-0">
+        <div class="flex-1 overflow-y-auto">
+          <div class="p-4 space-y-4">
+
+            <% if flash[:support_notice] %>
+              <div class="bg-green-50 border border-green-200 rounded-lg px-4 py-3 text-sm text-green-800"><%= flash[:support_notice] %></div>
+            <% end %>
+
+            <%# Search %>
+            <div class="relative">
+              <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <input type="text"
+                     data-support-target="search"
+                     data-action="input->support#search"
+                     placeholder="Search articles…"
+                     class="w-full pl-9 pr-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent">
+            </div>
+
+            <%# Articles %>
+            <div class="space-y-1">
+              <%
+                articles = [
+                  { title: "Getting started with Northbolt",    desc: "Set up your first lock and grant tenant access" },
+                  { title: "How to grant a tenant access",       desc: "Issue a PIN and set access dates" },
+                  { title: "How to revoke access",               desc: "Remove a tenant's access before their lease ends" },
+                  { title: "What to do if a lock goes offline",  desc: "Troubleshooting cellular and connectivity issues" },
+                  { title: "Low battery — what to do",           desc: "When to act and how to replace the battery" },
+                  { title: "Managing your team",                 desc: "Invite members and set permission levels" },
+                ]
+              %>
+              <% articles.each do |article| %>
+                <div data-support-target="article" data-title="<%= article[:title].downcase %>"
+                     class="flex items-start gap-3 px-3 py-3 rounded-lg hover:bg-gray-50 cursor-pointer group">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mt-0.5 shrink-0 text-gray-400 group-hover:text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  <div>
+                    <p class="text-sm font-medium text-gray-900"><%= article[:title] %></p>
+                    <p class="text-xs text-gray-400 mt-0.5"><%= article[:desc] %></p>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+
+          </div>
+        </div>
+
+        <%# Fixed bottom CTA %>
+        <div class="shrink-0 p-4 border-t border-gray-100">
+          <button data-action="support#showContact"
+                  class="w-full px-4 py-2.5 text-sm font-medium text-white bg-gray-900 rounded-lg hover:bg-gray-700 transition-colors cursor-pointer">
+            Contact support
+          </button>
+        </div>
+      </div>
+
+      <%# Contact form view %>
+      <div data-support-target="contactView" class="hidden flex-col flex-1 min-h-0">
+        <div class="flex-1 overflow-y-auto">
+          <div class="p-4">
+            <% if flash[:support_alert] %>
+              <div class="mb-4 bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-sm text-red-700"><%= flash[:support_alert] %></div>
+            <% end %>
+            <%= form_with url: core_support_tickets_path, method: :post, class: "space-y-4" do |f| %>
+              <div>
+                <label class="block text-xs font-medium text-gray-700 mb-1.5">From</label>
+                <input type="text" value="<%= "#{current_user.first_name} #{current_user.last_name} (#{current_user.email})" %>" disabled
+                       class="w-full text-sm border border-gray-100 rounded-lg px-3 py-2.5 text-gray-400 bg-gray-50 cursor-not-allowed">
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-700 mb-1.5">Subject</label>
+                <input type="text" name="subject" required
+                       class="w-full text-sm border border-gray-200 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent">
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-700 mb-1.5">Message</label>
+                <textarea name="message" rows="6" required
+                          class="w-full text-sm border border-gray-200 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent resize-none"></textarea>
+              </div>
+              <%= f.submit "Send message",
+                    class: "w-full px-4 py-2.5 text-sm font-medium text-white bg-gray-900 rounded-lg hover:bg-gray-700 transition-colors cursor-pointer" %>
+            <% end %>
+          </div>
+        </div>
       </div>
 
     </div>
