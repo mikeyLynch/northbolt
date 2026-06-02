@@ -9,7 +9,7 @@
     <link rel="icon" href="/icon.png" type="image/png">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
-    <%= javascript_importmap_tags %>
+    <%= javascript_importmap_tags "public_application", importmap: PUBLIC_IMPORTMAP %>
   </head>
   <body class="bg-gray-50 text-gray-900 antialiased min-h-screen flex flex-col items-center justify-center px-6">
     <div class="w-full max-w-sm">
