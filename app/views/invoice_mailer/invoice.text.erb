@@ -1,0 +1,13 @@
+Invoice <%= @invoice.number %> from Northbolt
+
+Hi <%= @business.billing_legal_name %>,
+
+Please find your invoice <%= @invoice.number %> for <%= format("£%.2f", @invoice.total_pence / 100.0) %> (inc. VAT), due by <%= @invoice.due_at.strftime("%-d %B %Y") %>.
+
+Payment by BACS: <%= Invoice::COMPANY_BACS %>
+Please reference <%= @invoice.number %> with your payment.
+
+View and download your invoice at:
+<%= core_billing_url %>
+
+<%= Invoice::COMPANY_NAME %> · Company No: <%= Invoice::COMPANY_NUMBER %> · VAT No: <%= Invoice::COMPANY_VAT %>

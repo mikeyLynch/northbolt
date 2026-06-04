@@ -44,6 +44,7 @@ gem "thruster", require: false
 gem "devise"
 gem "kaminari"
 gem "rbnacl"
+gem "receipts"
 gem "rswag-api"
 gem "rswag-ui"
 

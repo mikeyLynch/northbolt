@@ -10,6 +10,16 @@ RSpec.describe Business, type: :model do
     it { is_expected.to validate_presence_of(:name) }
   end
 
+  describe "#vat_registered?" do
+    it "returns true when vat_number is present" do
+      expect(build(:business, vat_number: "GB123456789")).to be_vat_registered
+    end
+
+    it "returns false when vat_number is blank" do
+      expect(build(:business, vat_number: nil)).not_to be_vat_registered
+    end
+  end
+
   describe "#role_can?" do
     let(:business) { create(:business) }
 

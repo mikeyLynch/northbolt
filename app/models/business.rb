@@ -9,6 +9,7 @@ class Business < ApplicationRecord
 
   ROLE_LABELS = { "high" => "High", "medium" => "Medium", "low" => "Low" }.freeze
   has_many :locations,  dependent: :destroy
+  has_many :invoices,   dependent: :destroy
   has_many :locks,      through: :locations
   has_many :tenants,    dependent: :destroy
   has_many :users,      dependent: :destroy
@@ -17,6 +18,16 @@ class Business < ApplicationRecord
   has_many :invitations,   dependent: :destroy
 
   validates :name, presence: true
+
+  def vat_registered?
+    vat_number.present?
+  end
+
+  def billing_legal_name = billing_details["legal_name"].presence || name
+  def billing_address_line_1 = billing_details["address_line_1"]
+  def billing_address_line_2 = billing_details["address_line_2"]
+  def billing_city           = billing_details["city"]
+  def billing_postcode       = billing_details["postcode"]
 
   def role_can?(role, permission)
     permission_matrix.fetch(role.to_s, []).include?(permission.to_s)

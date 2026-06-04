@@ -24,7 +24,8 @@ Rails.application.routes.draw do
 
     get  "dashboard",              to: "dashboard#index",       as: :dashboard
     get  "activity",               to: "activity#index",        as: :activity
-    get  "billing",                to: "billing#index",         as: :billing
+    get  "billing",                   to: "billing#index",            as: :billing
+    get  "billing/invoices/:id/download", to: "billing#download_invoice", as: :billing_invoice_download
     get    "settings",                to: "settings#index",         as: :settings
     patch  "settings",                to: "settings#update_general",     as: :settings_general
     patch  "settings/permissions",    to: "settings#update_permissions", as: :settings_permissions

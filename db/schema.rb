@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_01_141625) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_04_155204) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -49,12 +49,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_01_141625) do
   end
 
   create_table "businesses", force: :cascade do |t|
+    t.jsonb "billing_details", default: {}, null: false
     t.datetime "created_at", null: false
     t.string "name", null: false
     t.jsonb "permission_matrix", default: {"low" => ["grant_access", "view_activity"], "high" => ["manage_team", "manage_settings", "manage_api_keys", "manage_tenants", "grant_access", "revoke_access", "view_activity"], "medium" => ["manage_tenants", "grant_access", "revoke_access", "view_activity"]}, null: false
     t.string "stora_webhook_secret"
     t.string "stora_webhook_token"
     t.datetime "updated_at", null: false
+    t.string "vat_number"
     t.index ["stora_webhook_token"], name: "index_businesses_on_stora_webhook_token", unique: true
   end
 
@@ -71,6 +73,43 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_01_141625) do
     t.index ["business_id"], name: "index_invitations_on_business_id"
     t.index ["invited_by_id"], name: "index_invitations_on_invited_by_id"
     t.index ["token"], name: "index_invitations_on_token", unique: true
+  end
+
+  create_table "invoice_line_items", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "description", null: false
+    t.bigint "invoice_id", null: false
+    t.decimal "quantity", precision: 10, scale: 2, default: "1.0", null: false
+    t.integer "total_pence", null: false
+    t.integer "unit_price_pence", null: false
+    t.datetime "updated_at", null: false
+    t.index ["invoice_id"], name: "index_invoice_line_items_on_invoice_id"
+  end
+
+  create_table "invoices", force: :cascade do |t|
+    t.bigint "business_id", null: false
+    t.string "category", null: false
+    t.datetime "created_at", null: false
+    t.integer "discount_amount_pence", default: 0
+    t.string "discount_type"
+    t.decimal "discount_value", precision: 10, scale: 2
+    t.date "due_at"
+    t.string "installment"
+    t.date "issued_at"
+    t.text "notes"
+    t.string "number", null: false
+    t.datetime "paid_at"
+    t.date "service_period_end"
+    t.date "service_period_start"
+    t.string "status", default: "draft", null: false
+    t.integer "subtotal_pence", default: 0, null: false
+    t.integer "total_pence", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.integer "vat_pence", default: 0, null: false
+    t.decimal "vat_rate", precision: 5, scale: 4, default: "0.2", null: false
+    t.index ["business_id", "status"], name: "index_invoices_on_business_id_and_status"
+    t.index ["business_id"], name: "index_invoices_on_business_id"
+    t.index ["number"], name: "index_invoices_on_number", unique: true
   end
 
   create_table "locations", force: :cascade do |t|
@@ -111,6 +150,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_01_141625) do
     t.datetime "updated_at", null: false
     t.index ["business_id"], name: "index_notifications_on_business_id"
     t.index ["notifiable_type", "notifiable_id"], name: "index_notifications_on_notifiable"
+  end
+
+  create_table "refunds", force: :cascade do |t|
+    t.integer "amount_pence", null: false
+    t.datetime "created_at", null: false
+    t.bigint "invoice_id", null: false
+    t.datetime "issued_at", null: false
+    t.text "reason", null: false
+    t.datetime "updated_at", null: false
+    t.index ["invoice_id"], name: "index_refunds_on_invoice_id"
   end
 
   create_table "solid_cache_entries", force: :cascade do |t|
@@ -287,9 +336,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_01_141625) do
   add_foreign_key "api_keys", "businesses"
   add_foreign_key "invitations", "businesses"
   add_foreign_key "invitations", "users", column: "invited_by_id"
+  add_foreign_key "invoice_line_items", "invoices"
+  add_foreign_key "invoices", "businesses"
   add_foreign_key "locations", "businesses"
   add_foreign_key "locks", "locations"
   add_foreign_key "notifications", "businesses"
+  add_foreign_key "refunds", "invoices"
   add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_claimed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_failed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
