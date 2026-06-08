@@ -25,9 +25,13 @@ class Core::Tenants::LockAssignmentsController < Core::BaseController
       next
     end
 
-    if issued_grants.any?
-      TenantMailer.access_granted(@tenant, issued_grants).deliver_later
+    if issued_grants.empty?
+      @available_locks = available_locks
+      flash.now[:alert] = "Please select at least one lock."
+      return render :new, status: :unprocessable_content
     end
+
+    TenantMailer.access_granted(@tenant, issued_grants).deliver_later
 
     count = issued_grants.size
     redirect_to core_tenant_path(@tenant),
