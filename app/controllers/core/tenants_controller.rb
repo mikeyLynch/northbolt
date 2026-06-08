@@ -101,8 +101,7 @@ class Core::TenantsController < Core::BaseController
   end
 
   def destroy
-    @tenant.destroy
-    redirect_to core_tenants_path
+    raise "Not implemented"
   end
 
   private

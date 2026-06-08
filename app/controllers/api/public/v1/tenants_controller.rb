@@ -14,6 +14,10 @@ class Api::Public::V1::TenantsController < Api::Public::V1::BaseController
     end
   end
 
+  def destroy
+    raise "Not implemented"
+  end
+
   private
 
   def tenant_params
