@@ -15,6 +15,12 @@ module ApplicationHelper
     "low_battery"   => "bg-amber-100 text-amber-600"
   }.freeze
 
+  # Renders a label + input + inline error message for a model-backed form field.
+  # Wraps in a space-y-1 div. The px-4 py-3 cell wrapper stays in the view.
+  #
+  # Usage:
+  #   <%= form_field f, :first_name, autocomplete: "off" %>
+  #   <%= form_field f, :email, type: :email, placeholder: "jane@example.com" %>
   def event_label(event_type)
     EVENT_LABELS.fetch(event_type, event_type.humanize)
   end

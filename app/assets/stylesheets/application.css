@@ -8,3 +8,10 @@
  *
  * Consider organizing styles into separate files for maintainability.
  */
+
+/*
+  Safelist — classes generated dynamically via ERB interpolation that Tailwind's
+  scanner cannot detect at build time. Adding them here ensures they're compiled.
+
+  border-red-400 focus:ring-red-400
+*/

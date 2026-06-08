@@ -83,7 +83,8 @@ class Core::TenantsController < Core::BaseController
       redirect_to core_tenant_path(@tenant), notice: notice
     else
       @available_locks = available_locks
-      render :new, status: :unprocessable_entity
+      flash.now[:alert] = "Please correct the errors below."
+      render :new, status: :unprocessable_content
     end
   end
 
@@ -94,7 +95,8 @@ class Core::TenantsController < Core::BaseController
     if @tenant.update(tenant_params)
       redirect_to core_tenant_path(@tenant)
     else
-      render :edit, status: :unprocessable_entity
+      flash.now[:alert] = "Please correct the errors below."
+      render :edit, status: :unprocessable_content
     end
   end
 

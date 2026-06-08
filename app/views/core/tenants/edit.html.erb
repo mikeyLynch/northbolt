@@ -13,40 +13,34 @@
 
   <%= form_with model: [:core, @tenant], class: "space-y-6" do |f| %>
 
-    <% if @tenant.errors.any? %>
-      <div class="px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-sm text-red-700 space-y-1">
-        <% @tenant.errors.full_messages.each do |msg| %>
-          <p><%= msg %></p>
-        <% end %>
-      </div>
-    <% end %>
-
     <div class="bg-white border border-gray-200 rounded-xl divide-y divide-gray-100">
       <div class="px-4 py-3 grid grid-cols-2 gap-3">
-        <div class="space-y-1">
-          <%= f.label :first_name, class: "block text-xs font-medium text-gray-500" %>
-          <%= f.text_field :first_name,
-                class: "w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent",
-                autocomplete: "off" %>
-        </div>
-        <div class="space-y-1">
-          <%= f.label :last_name, class: "block text-xs font-medium text-gray-500" %>
-          <%= f.text_field :last_name,
-                class: "w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent",
-                autocomplete: "off" %>
-        </div>
+        <% [:first_name, :last_name].each do |attr| %>
+          <div class="space-y-1">
+            <%= f.label attr, class: "block text-xs font-medium text-gray-500" %>
+            <%= f.text_field attr, autocomplete: "off",
+                  class: "w-full px-3 py-2 text-sm border rounded-lg bg-white focus:outline-none focus:ring-2 focus:border-transparent #{@tenant.errors[attr].any? ? 'border-red-400 focus:ring-red-400' : 'border-gray-200 focus:ring-gray-900'}" %>
+            <% if @tenant.errors[attr].any? %>
+              <p class="text-xs text-red-600"><%= @tenant.errors[attr].first %></p>
+            <% end %>
+          </div>
+        <% end %>
       </div>
       <div class="px-4 py-3 space-y-1">
         <%= f.label :email, class: "block text-xs font-medium text-gray-500" %>
-        <%= f.email_field :email,
-              class: "w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent",
-              autocomplete: "off" %>
+        <%= f.email_field :email, autocomplete: "off",
+              class: "w-full px-3 py-2 text-sm border rounded-lg bg-white focus:outline-none focus:ring-2 focus:border-transparent #{@tenant.errors[:email].any? ? 'border-red-400 focus:ring-red-400' : 'border-gray-200 focus:ring-gray-900'}" %>
+        <% if @tenant.errors[:email].any? %>
+          <p class="text-xs text-red-600"><%= @tenant.errors[:email].first %></p>
+        <% end %>
       </div>
       <div class="px-4 py-3 space-y-1">
         <%= f.label :phone, class: "block text-xs font-medium text-gray-500" %>
-        <%= f.telephone_field :phone,
-              class: "w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent",
-              autocomplete: "off" %>
+        <%= f.telephone_field :phone, autocomplete: "off",
+              class: "w-full px-3 py-2 text-sm border rounded-lg bg-white focus:outline-none focus:ring-2 focus:border-transparent #{@tenant.errors[:phone].any? ? 'border-red-400 focus:ring-red-400' : 'border-gray-200 focus:ring-gray-900'}" %>
+        <% if @tenant.errors[:phone].any? %>
+          <p class="text-xs text-red-600"><%= @tenant.errors[:phone].first %></p>
+        <% end %>
       </div>
     </div>
 

@@ -8,7 +8,7 @@ class Core::AccountController < Core::BaseController
                            email:      params[:email].to_s.strip.downcase)
       redirect_to core_account_path, notice: "Profile updated."
     else
-      flash.now[:alert] = current_user.errors.full_messages.to_sentence
+      flash.now[:alert] = "Please correct the errors below."
       render :show, status: :unprocessable_content
     end
   end
