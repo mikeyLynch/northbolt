@@ -11,9 +11,7 @@
     <h1 class="text-lg font-semibold text-gray-900">Assign lock to <%= @tenant.full_name %></h1>
   </div>
 
-  <% if flash[:alert] %>
-    <div class="px-4 py-3 rounded-lg bg-red-50 text-sm text-red-600"><%= flash[:alert] %></div>
-  <% end %>
+
 
   <%= form_with url: core_tenant_access_grants_path(@tenant), method: :post do |f| %>
     <div class="bg-white border border-gray-200 rounded-xl divide-y divide-gray-100">
