@@ -15,12 +15,14 @@ class Core::AccountController < Core::BaseController
 
   def update_password
     unless current_user.valid_password?(params[:current_password])
-      flash.now[:password_alert] = "Current password is incorrect."
+      flash.now[:alert] = "Please correct the errors below."
+      @current_password_error = "Current password is incorrect."
       return render :show, status: :unprocessable_content
     end
 
     if params[:password] != params[:password_confirmation]
-      flash.now[:password_alert] = "New passwords don't match."
+      flash.now[:alert] = "Please correct the errors below."
+      @password_confirmation_error = "New passwords don't match."
       return render :show, status: :unprocessable_content
     end
 
