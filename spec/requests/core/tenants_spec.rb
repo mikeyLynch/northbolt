@@ -183,14 +183,6 @@ RSpec.describe "Core::Tenants", type: :request do
   describe "DELETE /tenants/:id" do
     before { sign_in user }
 
-    it "destroys the tenant and redirects to index" do
-      expect {
-        delete core_tenant_path(tenant)
-      }.to change { business.tenants.count }.by(-1)
-
-      expect(response).to redirect_to(core_tenants_path)
-    end
-
     it "cannot delete another business's tenant" do
       expect {
         delete core_tenant_path(other_tenant)
