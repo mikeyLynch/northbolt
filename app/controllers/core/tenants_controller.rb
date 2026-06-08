@@ -93,7 +93,7 @@ class Core::TenantsController < Core::BaseController
 
   def update
     if @tenant.update(tenant_params)
-      redirect_to core_tenant_path(@tenant)
+      redirect_to core_tenant_path(@tenant), notice: "Tenant updated."
     else
       flash.now[:alert] = "Please correct the errors below."
       render :edit, status: :unprocessable_content

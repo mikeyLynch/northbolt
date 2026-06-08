@@ -99,6 +99,11 @@ RSpec.describe "Core::Tenants", type: :request do
         post core_tenants_path, params: { tenant: { first_name: "", last_name: "" } }
         expect(response).to have_http_status(:unprocessable_content)
       end
+
+      it "sets a flash alert" do
+        post core_tenants_path, params: { tenant: { first_name: "", last_name: "" } }
+        expect(flash[:alert]).to be_present
+      end
     end
 
     context "with lock assignments" do
@@ -154,9 +159,19 @@ RSpec.describe "Core::Tenants", type: :request do
       expect(tenant.reload.first_name).to eq("Janet")
     end
 
+    it "flashes a success notice on update" do
+      patch core_tenant_path(tenant), params: { tenant: { first_name: "Janet" } }
+      expect(flash[:notice]).to eq("Tenant updated.")
+    end
+
     it "re-renders edit with unprocessable entity on invalid params" do
       patch core_tenant_path(tenant), params: { tenant: { first_name: "" } }
       expect(response).to have_http_status(:unprocessable_content)
+    end
+
+    it "sets a flash alert on invalid params" do
+      patch core_tenant_path(tenant), params: { tenant: { first_name: "" } }
+      expect(flash[:alert]).to be_present
     end
 
     it "cannot update another business's tenant" do
