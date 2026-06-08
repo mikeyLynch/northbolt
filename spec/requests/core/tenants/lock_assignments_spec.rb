@@ -23,15 +23,24 @@ RSpec.describe "Core::Tenants::LockAssignments", type: :request do
         expect(response).to have_http_status(:unprocessable_content)
       end
 
-      it "sets a flash alert" do
+      it "sets a flash alert about selecting a lock" do
         post core_tenant_lock_assignments_path(tenant)
-        expect(flash[:alert]).to be_present
+        expect(flash[:alert]).to include("select at least one lock")
       end
 
       it "does not create any access grants" do
         expect {
           post core_tenant_lock_assignments_path(tenant)
         }.not_to change(AccessGrant, :count)
+      end
+    end
+
+    context "with a lock selected but no end date" do
+      it "sets a flash alert about the end date" do
+        post core_tenant_lock_assignments_path(tenant), params: {
+          lock_assignments: { "0" => { lock_id: lock.id, starts_at: Date.current.to_s, ends_at: "" } }
+        }
+        expect(flash[:alert]).to include("end date")
       end
     end
 

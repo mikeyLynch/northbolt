@@ -27,7 +27,8 @@ class Core::Tenants::LockAssignmentsController < Core::BaseController
 
     if issued_grants.empty?
       @available_locks = available_locks
-      flash.now[:alert] = "Please select at least one lock."
+      any_lock_selected = params.fetch(:lock_assignments, {}).values.any? { |a| a[:lock_id].present? }
+      flash.now[:alert] = any_lock_selected ? "Please set an end date for each assigned lock." : "Please select at least one lock."
       return render :new, status: :unprocessable_content
     end
 
