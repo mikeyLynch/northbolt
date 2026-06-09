@@ -15,11 +15,13 @@ class Core::AccessGrantsController < Core::BaseController
       redirect_to return_to_path
     else
       @return_to = params[:return_to]
-      render :edit, status: :unprocessable_entity
+      flash.now[:alert] = "Please correct the errors below."
+      render :edit, status: :unprocessable_content
     end
   rescue ArgumentError, Date::Error
     @return_to = params[:return_to]
-    render :edit, status: :unprocessable_entity
+    flash.now[:alert] = "Please correct the errors below."
+    render :edit, status: :unprocessable_content
   end
 
   def revoke

@@ -12,7 +12,7 @@ class Core::Locks::AccessGrantsController < Core::BaseController
     ends_at   = Date.parse(params[:access_grant][:ends_at]).end_of_day
     tenant    = find_or_build_tenant
 
-    return render :new, status: :unprocessable_entity unless tenant.save
+    return render :new, status: :unprocessable_content unless tenant.save
 
     grant, _pin = AccessGrant.issue!(lock: @lock, tenant: tenant, starts_at: starts_at, ends_at: ends_at)
     TenantMailer.access_granted(tenant, [ grant ]).deliver_later
@@ -20,7 +20,7 @@ class Core::Locks::AccessGrantsController < Core::BaseController
   rescue ActiveRecord::RecordInvalid => e
     @tenants = current_user.business.tenants.order(:last_name, :first_name)
     flash.now[:alert] = e.record.errors.full_messages.to_sentence
-    render :new, status: :unprocessable_entity
+    render :new, status: :unprocessable_content
   end
 
   private

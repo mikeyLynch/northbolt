@@ -27,12 +27,18 @@
         <div class="space-y-1">
           <%= f.label :starts_at, "From", class: "block text-sm font-medium text-gray-700" %>
           <%= f.date_field :starts_at, value: @grant.starts_at.to_date,
-                class: "w-full py-2 px-3 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent" %>
+                class: "w-full py-2 px-3 text-sm border rounded-lg bg-white focus:outline-none focus:ring-2 focus:border-transparent #{@grant.errors[:starts_at].any? ? 'border-red-400 focus:ring-red-400' : 'border-gray-200 focus:ring-gray-900'}" %>
+          <% if @grant.errors[:starts_at].any? %>
+            <p class="text-xs text-red-600"><%= @grant.errors[:starts_at].first %></p>
+          <% end %>
         </div>
         <div class="space-y-1">
           <%= f.label :ends_at, "Until", class: "block text-sm font-medium text-gray-700" %>
           <%= f.date_field :ends_at, value: @grant.ends_at.to_date,
-                class: "w-full py-2 px-3 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent" %>
+                class: "w-full py-2 px-3 text-sm border rounded-lg bg-white focus:outline-none focus:ring-2 focus:border-transparent #{@grant.errors[:ends_at].any? ? 'border-red-400 focus:ring-red-400' : 'border-gray-200 focus:ring-gray-900'}" %>
+          <% if @grant.errors[:ends_at].any? %>
+            <p class="text-xs text-red-600"><%= @grant.errors[:ends_at].first %></p>
+          <% end %>
         </div>
       </div>
     </div>

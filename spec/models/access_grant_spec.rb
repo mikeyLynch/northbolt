@@ -11,6 +11,19 @@ RSpec.describe AccessGrant, type: :model do
     it { is_expected.to validate_presence_of(:starts_at) }
     it { is_expected.to validate_presence_of(:ends_at) }
 
+    it "is invalid when ends_at is before starts_at" do
+      grant = build(:access_grant, starts_at: 1.week.from_now, ends_at: Date.current)
+      expect(grant).not_to be_valid
+      expect(grant.errors[:ends_at]).to include("must be after the start date")
+    end
+
+    it "is invalid when ends_at equals starts_at" do
+      t = Time.current
+      grant = build(:access_grant, starts_at: t, ends_at: t)
+      expect(grant).not_to be_valid
+      expect(grant.errors[:ends_at]).to include("must be after the start date")
+    end
+
     it "prevents a second active grant on the same lock" do
       lock = create(:lock)
       create(:access_grant, lock: lock)

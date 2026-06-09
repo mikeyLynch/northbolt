@@ -12,7 +12,8 @@ FactoryBot.define do
     end
 
     trait :expired do
-      ends_at { 1.day.ago }
+      starts_at { 2.days.ago }
+      ends_at   { 1.day.ago }
     end
   end
 end

@@ -16,7 +16,7 @@ class Core::Tenants::AccessGrantsController < Core::BaseController
   rescue ActiveRecord::RecordInvalid => e
     @available_locks = available_locks
     flash.now[:alert] = e.record.errors.full_messages.to_sentence
-    render :new, status: :unprocessable_entity
+    render :new, status: :unprocessable_content
   end
 
   private

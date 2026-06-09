@@ -5,6 +5,7 @@ class AccessGrant < ApplicationRecord
   validates :pin_ciphertext, presence: true
   validates :starts_at,   presence: true
   validates :ends_at,     presence: true
+  validate  :ends_at_after_starts_at
   validate  :only_one_active_grant_per_lock, on: :create
 
   scope :active,  -> { where(revoked_at: nil) }
@@ -36,6 +37,11 @@ class AccessGrant < ApplicationRecord
   end
 
   private
+
+  def ends_at_after_starts_at
+    return unless starts_at.present? && ends_at.present?
+    errors.add(:ends_at, "must be after the start date") if ends_at <= starts_at
+  end
 
   def only_one_active_grant_per_lock
     return unless lock_id.present?
